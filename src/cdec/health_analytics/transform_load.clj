@@ -15,9 +15,11 @@
        (not (.startsWith row ","))))
 
 (defn numbers-as-strings? [& strings]
+ ;; (infof "Numbers as strings: %s" strings)
   (every? #(re-find #"^-?\d+(?:\.\d+)?$" %) strings))
 
 (defn parse-double [txt]
+;;  (infof "Parsing double: %s" txt)
   (Double/parseDouble txt))
 
 (defn split-line [line]
