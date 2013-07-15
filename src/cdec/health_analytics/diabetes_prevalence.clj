@@ -32,33 +32,33 @@
       (tl/split-line ?line :#> 5 {0 ?gp-code 2 ?ccg-code 3 ?ccg-name})))
 
 (defn diabetes-prevalence-gp [input]
-  (<- [?gp-code ?gp-name ?gp-registered ?gp-prevalence ?gp-percentage]
+  (<- [?gp-code ?gp-name ?registered-patients ?diabetes-patients ?prevalence]
       (input ?line)
       (tl/data-line? ?line)
-      (tl/split-line ?line :#> 9 {4 ?gp-code 5 ?gp-name 6 ?gp-registered-dirty 7 ?gp-prevalence-dirty 8 ?gp-percentage-dirty})
-      (scrub-data ?gp-percentage-dirty :> ?gp-percentage)
-      (scrub-data ?gp-registered-dirty :> ?gp-registered )
-      (scrub-data ?gp-prevalence-dirty :> ?gp-prevalence)))
+      (tl/split-line ?line :#> 9 {4 ?gp-code 5 ?gp-name 6 ?registered-patients-dirty 7 ?diabetes-patients-dirty 8 ?prevalence-dirty})
+      (scrub-data ?registered-patients-dirty :> ?registered-patients )
+      (scrub-data ?diabetes-patients-dirty :> ?diabetes-patients)
+       (scrub-data ?prevalence-dirty :> ?prevalence)))
 
 (defn diabetes-prevalence-ccg [ccg-gp-list gp-prevalence]
-  (<- [?ccg-code ?ccg-name ?ccg-total ?prevalence-total ?percentile]
-      (gp-prevalence :> ?gp-code ?gp-name ?gp-total-dirty ?gp-prevalence-dirty _)
+  (<- [?ccg-code ?ccg-name ?ccg-registered-patients ?ccg-diabetes-patients ?ccg-prevalence]
+      (gp-prevalence :> ?gp-code ?gp-name ?gp-registered-patients-dirty ?gp-diabetes-patients-dirty _)
       (ccg-gp-list ?ccg-line)
       (tl/data-line? ?ccg-line)
       (tl/split-line ?ccg-line :#> 5 {0 ?gp-code 2 ?ccg-code 3 ?ccg-name-dirty})
       (scrub-data ?ccg-name-dirty :> ?ccg-name)
-      (tl/numbers-as-strings? ?gp-total-dirty)
-      (tl/parse-double ?gp-total-dirty :> ?gp-total)
-      (ops/sum ?gp-total :> ?ccg-total)
-      (tl/numbers-as-strings? ?gp-prevalence-dirty)
-      (tl/parse-double ?gp-prevalence-dirty :> ?gp-prevalence)
-      (ops/sum ?gp-prevalence :> ?prevalence-total)
-      (calculate-percentage ?prevalence-total ?ccg-total :> ?percentile)))
+      (tl/numbers-as-strings? ?gp-registered-patients-dirty)
+      (tl/parse-double ?gp-registered-patients-dirty :> ?gp-registered-patients)
+      (ops/sum ?gp-registered-patients :> ?ccg-registered-patients)
+      (tl/numbers-as-strings? ?gp-diabetes-patients-dirty)
+      (tl/parse-double ?gp-diabetes-patients-dirty :> ?gp-diabetes-patients)
+      (ops/sum ?gp-diabetes-patients :> ?ccg-diabetes-patients)
+      (calculate-percentage ?ccg-diabetes-patients ?ccg-registered-patients :> ?ccg-prevalence)))
 
 (defn gp-percentage-within-ccg [gp-join-ccg-prevalence ccg-prevalence]
-  (<- [?gp-code ?gp-name ?gp-reg ?gp-prev ?gp-per ?ccg-code ?ccg-name ?ccg-reg ?ccg-prev ?ccg-per]
-      (gp-join-ccg-prevalence :> ?gp-code ?gp-name ?ccg-code ?gp-reg ?gp-prev ?gp-per)
-      (ccg-prevalence :> ?ccg-code ?ccg-name ?ccg-reg ?ccg-prev ?ccg-per)
+  (<- [?gp-code ?gp-name ?gp-registered-patients ?gp-diabetes-patients ?gp-prevalence ?ccg-code ?ccg-name ?ccg-registered-patients ?ccg-diabetes-patients ?ccg-prevalence]
+      (gp-join-ccg-prevalence :> ?gp-code ?gp-name ?ccg-code ?gp-registered-patients ?gp-diabetes-patients ?gp-prevalence)
+      (ccg-prevalence :> ?ccg-code ?ccg-name ?ccg-registered-patients ?ccg-diabetes-patients ?ccg-prevalence)
      ;; (calculate-percentage ?gp-prev ?ccg-prev :> ?gp-ccg-per)
       ))
 
@@ -70,22 +70,22 @@
       (ops/limit [n] ?gp-code ?gp-name ?gp-percentage :> ?gp-code-out ?gp-name-out ?gp-percentage-out)))
 
 (defn top-n-per-ccg [input n order]
-  (<- [?ccg-code-out ?gp-code-out ?prevalence-out]
-      (input :> ?gp-code ?gp-name ?gp-reg ?gp-prev ?gp-per ?ccg-code-out ?ccg-name ?ccg-reg ?ccg-prev ?ccg-per)
-      (:sort ?gp-per)
+  (<- [?ccg-code-out ?gp-code-out ?gp-prevalence-out]
+      (input :> ?gp-code ?gp-name ?gp-registered-patients ?gp-diabetes-patients ?gp-prevalence ?ccg-code-out ?ccg-name ?ccg-registered-patients ?ccg-diabetes-patients ?ccg-prevalence)
+      (:sort ?gp-prevalence)
       (:reverse order)
-      (ops/limit [n] ?gp-code ?gp-per :> ?gp-code-out ?prevalence-out)))
+      (ops/limit [n] ?gp-code ?gp-prevalence :> ?gp-code-out ?gp-prevalence-out)))
 
 (defn top-n-ccg [input n order]
-  (<- [?ccg-code-out ?ccg-name-out ?ccg-reg-out ?ccg-per-out]
-      (input :> ?ccg-code ?ccg-name ?ccg-reg ?ccg-prev ?ccg-per)
-      (:sort ?ccg-per)
+  (<- [?ccg-code-out ?ccg-name-out ?ccg-registered-patients-out ?ccg-prevalence-out]
+      (input :> ?ccg-code ?ccg-name ?ccg-registered-patients ?ccg-diabetes-patients ?ccg-prevalence)
+      (:sort ?ccg-prevalence)
       (:reverse order)
-      (ops/limit [n] ?ccg-code ?ccg-name ?ccg-reg ?ccg-per :> ?ccg-code-out ?ccg-name-out ?ccg-reg-out ?ccg-per-out)))
+      (ops/limit [n] ?ccg-code ?ccg-name ?ccg-registered-patients ?ccg-prevalence :> ?ccg-code-out ?ccg-name-out ?ccg-registered-patients-out ?ccg-prevalence-out)))
 
 (defn join-gp-with-ccg [gp-prevalence gp-ccg-mapping]
-  (<- [?gp-code ?gp-name !!ccg-code ?total-gp-registered ?total-gp-prevalence ?gp-percentile]
-      (gp-prevalence :> ?gp-code ?gp-name ?total-gp-registered ?total-gp-prevalence ?gp-percentile)
+  (<- [?gp-code ?gp-name !!ccg-code ?gp-registered-patients ?gp-diabetes-patients ?gp-prevalence]
+      (gp-prevalence :> ?gp-code ?gp-name ?gp-registered-patients ?gp-diabetes-patients ?gp-prevalence)
       (gp-ccg-mapping :> ?gp-code !!ccg-code !!ccg-name)))
 
 
@@ -142,13 +142,21 @@
            (diabetes-prevalence-gp (hfs-textline data-in1))))
          10 true)))
 
-;; Top 10 10 GP surgeries in all England
+;; Top 10 GP surgeries in all England
 #_ (let [data-in "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"
          data-out "./output/top-10-gp-england/"]
      (?- (hfs-delimited data-out :sinkmode :replace :delimiter ",")
          (top-n
           (diabetes-prevalence-gp (hfs-textline data-in))
           10 false)))
+
+;; Bottom 10 GP surgeries in all England
+#_ (let [data-in "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"
+         data-out "./output/bottom-10-gp-england/"]
+     (?- (hfs-delimited data-out :sinkmode :replace :delimiter ",")
+         (top-n
+          (diabetes-prevalence-gp (hfs-textline data-in))
+          10 true)))
 
 #_ (let [data-in1 "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"
          data-in2 "./input/list-of-proposed-practices-ccg.csv"
