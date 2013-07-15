@@ -10,8 +10,8 @@
 #_(bootstrap-emacs)
 
 (defn gp-prescriptions [in]
-  (<- [?sha ?pct ?practice ?bnf_code ?bnf_name ?items ?nic ?act_cost ?quantity ?period]
-      (in :> ?sha ?pct ?practice ?bnf_code ?bnf_name ?items ?nic ?act_cost ?quantity ?period _)))
+  (<- [?sha ?pct ?practice ?bnf_code ?bnf_name ?items ?net-ingredient-cost ?act_cost ?quantity ?period]
+      (in :> ?sha ?pct ?practice ?bnf_code ?bnf_name ?items ?net-ingredient-cost ?act_cost ?quantity ?period _)))
 
 (defn contains-string? [search-term src]
   (< -1 (.indexOf (string/lower-case src) (string/lower-case search-term))))
@@ -42,8 +42,8 @@
                  "Lancet" "Strips"]))
 
 (defn humalog [scrips]
-  (<- [?sha ?pct ?practice ?bnf-code ?bnf-name ?items ?nic ?act-cost ?quantity ?period]
-      (scrips :> ?sha ?pct ?practice ?bnf-code ?bnf-name ?items ?nic ?act-cost ?quantity ?period)
+  (<- [?sha ?pct ?practice ?bnf-code ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?period]
+      (scrips :> ?sha ?pct ?practice ?bnf-code ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?period)
       (contains-string? "Humalog" ?bnf-name)))
 
 #_(?- (hfs-delimited "./output/humalog/" :delimiter "," :sinkmode :replace)
@@ -53,8 +53,8 @@
       (:trap (stdout)))
 
 (defn diabetes-scrips [scrips]
-  (<- [?sha ?pct ?practice ?bnf-code ?bnf-name ?items ?nic ?act-cost ?quantity ?period]
-      (scrips :> ?sha ?pct ?practice ?bnf-code ?bnf-name ?items ?nic ?act-cost ?quantity ?period)
+  (<- [?sha ?pct ?practice ?bnf-code ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?period]
+      (scrips :> ?sha ?pct ?practice ?bnf-code ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?period)
       (diabetes-drug? ?bnf-name)))
 
 #_(?- (hfs-delimited "./output/diabetes-scrips/" :delimiter "," :sinkmode :replace)
@@ -81,7 +81,7 @@
 ;; 3 bnf-code
 ;; 4 bnf-name
 ;; 5 items
-;; 6 nic
+;; 6 net-ingredient-cost
 ;; 7 act-cost
 ;; 8 quantity
 ;; 9 period
