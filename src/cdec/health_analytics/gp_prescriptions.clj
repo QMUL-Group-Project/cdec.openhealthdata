@@ -57,7 +57,7 @@
       (scrips :> ?sha ?pct ?practice ?bnf-code ?bnf-name ?items ?nic ?act-cost ?quantity ?period)
       (diabetes-drug? ?bnf-name)))
 
-#_(?- (hfs-delimited "./output/humalog/" :delimiter "," :sinkmode :replace)
+#_(?- (hfs-delimited "./output/diabetes-scrips/" :delimiter "," :sinkmode :replace)
       (diabetes-scrips
        (gp-prescriptions
         (hfs-delimited "./input/prescriptions/pdpi" :delimiter ",")))
