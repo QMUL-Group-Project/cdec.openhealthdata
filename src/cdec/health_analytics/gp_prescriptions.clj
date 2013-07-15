@@ -4,24 +4,26 @@
             [cascalog.tap :as tap]
             [clojure.string :as string]
             [clojure.tools.logging :refer [infof errorf]]
-            [cascalog.more-taps :refer [hfs-delimited]]))
+            [cascalog.more-taps :refer [hfs-delimited]]
+            [cdec.conversions :as conv]))
 
 #_(use 'cascalog.playground)
 #_(bootstrap-emacs)
 
+(defn year-month [period]
+  [(.substring period 0 4) (.substring period 4 6)])
+
 (defn gp-prescriptions [in]
-  (<- [?sha ?pct ?practice ?bnf_code ?bnf_name ?items ?nic ?act_cost ?quantity ?period]
-      (in :> ?sha ?pct ?practice ?bnf_code ?bnf_name ?items ?nic ?act_cost ?quantity ?period _)))
+  (<- [?sha ?pct ?practice ?bnf-code ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?year ?month]
+      (in :> ?sha ?pct ?practice ?bnf-code ?bnf-name ?items-string ?net-ingredient-cost-string ?act-cost-string ?quantity-string ?period _)
+      (conv/numbers-as-strings? ?items-string ?net-ingredient-cost-string ?act-cost-string ?quantity-string)
+      (conv/parse-double ?items-string :> ?items)
+      (conv/parse-double ?net-ingredient-cost-string :> ?net-ingredient-cost)
+      (conv/parse-double ?act-cost-string :> ?act-cost)
+      (conv/parse-double ?quantity-string :> ?quantity)
+      (year-month ?period :> ?year ?month)))
 
-(defn contains-string? [src search-term]
-  (< -1 (.indexOf (string/lower-case src) (string/lower-case search-term))))
-
-(defn humalog [scrips]
-  (<- [?sha ?pct ?practice ?bnf-code ?bnf-name ?items ?nic ?act-cost ?quantity ?period]
-      (scrips :> ?sha ?pct ?practice ?bnf-code ?bnf-name ?items ?nic ?act-cost ?quantity ?period)
-      (contains-string? ?bnf-name "Humalog")))
-
-#_(?- (hfs-delimited "./output/humalog/" :delimiter "," :sinkmode :replace)
+#_(?- (hfs-delimited "./output/gp-prescriptions/" :delimiter "," :sinkmode :replace)
       (humalog
        (gp-prescriptions
         (hfs-delimited "./input/prescriptions/pdpi" :delimiter ",")))
@@ -33,7 +35,11 @@
 ;; 3 bnf-code
 ;; 4 bnf-name
 ;; 5 items
-;; 6 nic
+;; 6 net-ingredient-cost
 ;; 7 act-cost
 ;; 8 quantity
+
 ;; 9 period
+
+;; 9 year
+;; 10 month
