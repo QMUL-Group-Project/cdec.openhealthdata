@@ -32,17 +32,17 @@
       (tl/split-line ?line :#> 5 {0 ?gp-code 2 ?ccg-code 3 ?ccg-name})))
 
 (defn diabetes-prevalence-gp [input]
-  (<- [?gp-code ?gp-registered ?gp-prevalence ?gp-percentage]
+  (<- [?gp-code ?gp-name ?gp-registered ?gp-prevalence ?gp-percentage]
       (input ?line)
       (tl/data-line? ?line)
-      (tl/split-line ?line :#> 9 {4 ?gp-code 6 ?gp-registered-dirty 7 ?gp-prevalence-dirty 8 ?gp-percentage-dirty})
+      (tl/split-line ?line :#> 9 {4 ?gp-code 5 ?gp-name 6 ?gp-registered-dirty 7 ?gp-prevalence-dirty 8 ?gp-percentage-dirty})
       (scrub-data ?gp-percentage-dirty :> ?gp-percentage)
       (scrub-data ?gp-registered-dirty :> ?gp-registered )
       (scrub-data ?gp-prevalence-dirty :> ?gp-prevalence)))
 
 (defn diabetes-prevalence-ccg [ccg-gp-list gp-prevalence]
   (<- [?ccg-code ?ccg-name ?ccg-total ?prevalence-total ?percentile]
-      (gp-prevalence :> ?gp-code ?gp-total-dirty ?gp-prevalence-dirty _)
+      (gp-prevalence :> ?gp-code ?gp-name ?gp-total-dirty ?gp-prevalence-dirty _)
       (ccg-gp-list ?ccg-line)
       (tl/data-line? ?ccg-line)
       (tl/split-line ?ccg-line :#> 5 {0 ?gp-code 2 ?ccg-code 3 ?ccg-name-dirty})
@@ -56,22 +56,22 @@
       (calculate-percentage ?prevalence-total ?ccg-total :> ?percentile)))
 
 (defn gp-percentage-within-ccg [gp-join-ccg-prevalence ccg-prevalence]
-  (<- [?gp-code ?gp-reg ?gp-prev ?gp-per ?ccg-code ?ccg-name ?ccg-reg ?ccg-prev ?ccg-per]
-      (gp-join-ccg-prevalence :> ?gp-code ?ccg-code ?gp-reg ?gp-prev ?gp-per)
+  (<- [?gp-code ?gp-name ?gp-reg ?gp-prev ?gp-per ?ccg-code ?ccg-name ?ccg-reg ?ccg-prev ?ccg-per]
+      (gp-join-ccg-prevalence :> ?gp-code ?gp-name ?ccg-code ?gp-reg ?gp-prev ?gp-per)
       (ccg-prevalence :> ?ccg-code ?ccg-name ?ccg-reg ?ccg-prev ?ccg-per)
      ;; (calculate-percentage ?gp-prev ?ccg-prev :> ?gp-ccg-per)
       ))
 
 (defn top-n [input n order]
-  (<- [?gp-code-out ?gp-percentage-out]
-      (input :> ?gp-code ?gp-registered ?gp-prevalence ?gp-percentage)
+  (<- [?gp-code-out ?gp-name-out ?gp-percentage-out]
+      (input :> ?gp-code ?gp-name ?gp-registered ?gp-prevalence ?gp-percentage)
       (:sort ?gp-percentage)
       (:reverse order)
-      (ops/limit [n] ?gp-code ?gp-percentage :> ?gp-code-out ?gp-percentage-out)))
+      (ops/limit [n] ?gp-code ?gp-name ?gp-percentage :> ?gp-code-out ?gp-name-out ?gp-percentage-out)))
 
 (defn top-n-per-ccg [input n order]
   (<- [?ccg-code-out ?gp-code-out ?prevalence-out]
-      (input :> ?gp-code ?gp-reg ?gp-prev ?gp-per ?ccg-code-out ?ccg-name ?ccg-reg ?ccg-prev ?ccg-per)
+      (input :> ?gp-code ?gp-name ?gp-reg ?gp-prev ?gp-per ?ccg-code-out ?ccg-name ?ccg-reg ?ccg-prev ?ccg-per)
       (:sort ?gp-per)
       (:reverse order)
       (ops/limit [n] ?gp-code ?gp-per :> ?gp-code-out ?prevalence-out)))
@@ -84,8 +84,8 @@
       (ops/limit [n] ?ccg-code ?ccg-name ?ccg-reg ?ccg-per :> ?ccg-code-out ?ccg-name-out ?ccg-reg-out ?ccg-per-out)))
 
 (defn join-gp-with-ccg [gp-prevalence gp-ccg-mapping]
-  (<- [?gp-code !!ccg-code ?total-gp-registered ?total-gp-prevalence ?gp-percentile]
-      (gp-prevalence :> ?gp-code ?total-gp-registered ?total-gp-prevalence ?gp-percentile)
+  (<- [?gp-code ?gp-name !!ccg-code ?total-gp-registered ?total-gp-prevalence ?gp-percentile]
+      (gp-prevalence :> ?gp-code ?gp-name ?total-gp-registered ?total-gp-prevalence ?gp-percentile)
       (gp-ccg-mapping :> ?gp-code !!ccg-code !!ccg-name)))
 
 
@@ -157,4 +157,4 @@
          (top-n-ccg
           (diabetes-prevalence-ccg
            (hfs-textline data-in2)
-           (diabetes-prevalence-gp (hfs-textline data-in1))) 10 true)))
+           (diabetes-prevalence-gp (hfs-textline data-in1))) 10 false)))
