@@ -76,6 +76,13 @@
       (:reverse order)
       (ops/limit [n] ?gp-code ?gp-per :> ?gp-code-out ?prevalence-out)))
 
+(defn top-n-ccg [input n order]
+  (<- [?ccg-code-out ?ccg-name-out ?ccg-reg-out ?ccg-per-out]
+      (input :> ?ccg-code ?ccg-name ?ccg-reg ?ccg-prev ?ccg-per)
+      (:sort ?ccg-per)
+      (:reverse order)
+      (ops/limit [n] ?ccg-code ?ccg-name ?ccg-reg ?ccg-per :> ?ccg-code-out ?ccg-name-out ?ccg-reg-out ?ccg-per-out)))
+
 (defn join-gp-with-ccg [gp-prevalence gp-ccg-mapping]
   (<- [?gp-code !!ccg-code ?total-gp-registered ?total-gp-prevalence ?gp-percentile]
       (gp-prevalence :> ?gp-code ?total-gp-registered ?total-gp-prevalence ?gp-percentile)
@@ -142,3 +149,12 @@
          (top-n
           (diabetes-prevalence-gp (hfs-textline data-in))
           10 false)))
+
+#_ (let [data-in1 "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"
+         data-in2 "./input/list-of-proposed-practices-ccg.csv"
+         data-out "./output/top-10-ccg/"]
+     (?- (hfs-delimited data-out :sinkmode :replace :delimiter ",")
+         (top-n-ccg
+          (diabetes-prevalence-ccg
+           (hfs-textline data-in2)
+           (diabetes-prevalence-gp (hfs-textline data-in1))) 10 true)))
