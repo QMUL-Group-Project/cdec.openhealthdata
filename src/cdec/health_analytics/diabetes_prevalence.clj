@@ -17,7 +17,7 @@
       (math/floor)))
 
 (defn calculate-percentage [value1 value2]
- ;; (infof "Calculating percentage: %s %s" value1 value2)
+  (infof "Calculating percentage: %s %s" value1 value2)
   (-> (/ value1 value2)
       (* 100)))
 
@@ -56,10 +56,12 @@
       (calculate-percentage ?ccg-diabetes-patients ?ccg-registered-patients :> ?ccg-prevalence)))
 
 (defn gp-percentage-within-ccg [gp-join-ccg-prevalence ccg-prevalence]
-  (<- [?gp-code ?gp-name ?gp-registered-patients ?gp-diabetes-patients ?gp-prevalence ?ccg-code ?ccg-name ?ccg-registered-patients ?ccg-diabetes-patients ?ccg-prevalence]
-      (gp-join-ccg-prevalence :> ?gp-code ?gp-name ?ccg-code ?gp-registered-patients ?gp-diabetes-patients ?gp-prevalence)
+  (<- [?gp-code ?gp-name ?gp-registered-patients ?gp-diabetes-patients ?gp-prevalence ?ccg-code ?ccg-name ?ccg-registered-patients ?ccg-diabetes-patients ?ccg-prevalence ?gp-ccg-prevalence]
+      (gp-join-ccg-prevalence :> ?gp-code ?gp-name ?ccg-code ?gp-registered-patients ?gp-diabetes-patients-dirty ?gp-prevalence)
       (ccg-prevalence :> ?ccg-code ?ccg-name ?ccg-registered-patients ?ccg-diabetes-patients ?ccg-prevalence)
-     ;; (calculate-percentage ?gp-prev ?ccg-prev :> ?gp-ccg-per)
+      (tl/numbers-as-strings? ?gp-diabetes-patients-dirty)
+      (tl/parse-double ?gp-diabetes-patients-dirty :> ?gp-diabetes-patients)
+      (calculate-percentage ?gp-diabetes-patients ?ccg-diabetes-patients :> ?gp-ccg-prevalence)
       ))
 
 (defn top-n [input n order]
