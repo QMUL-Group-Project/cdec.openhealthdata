@@ -5,7 +5,8 @@
             [cascalog.more-taps :refer [hfs-delimited]]
             [cdec.predicates :as pred]
             [cdec.health-analytics.gp-prescriptions :as prescriptions]
-            [cdec.health-analytics.diabetes-prevalence :as prevalence]))
+            [cdec.health-analytics.diabetes-prevalence :as prevalence]
+            [cdec.health-analytics.organisational-data :as ods]))
 
 #_(use 'cascalog.playground)
 #_(bootstrap-emacs)
@@ -32,27 +33,17 @@
                       ;; kit
                       "Lancet" "Strips"]))
 
-(defn diabetes-scrips [scrips]
-  (<- [?sha ?pct ?practice ?bnf-code ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?year ?month]
-      (scrips :> ?sha ?pct ?practice ?bnf-code ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?year ?month)
-      (diabetes-drug? ?bnf-name)))
-
-#_(?- (hfs-delimited "./output/diabetes-scrips/" :delimiter "," :sinkmode :replace)
-      (diabetes-scrips
-       (prescriptions/gp-prescriptions
-        (hfs-delimited "./input/prescriptions/pdpi" :delimiter ",")))
-      (:trap (stdout)))
-
-(defn diabetes-drugs [scrips]
-  (<- [?sha ?pct ?practice ?bnf-code ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?year ?month]
+(defn diabetes-drugs [scrips epraccur]
+  (<- [?sha ?ccg ?practice ?bnf-code ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?year ?month]
       (scrips :> ?sha ?pct ?practice ?bnf-code ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?year ?month)
       (diabetes-drug? ?bnf-name)
-      (:distinct true)))
+      (epraccur :#> 20 {0 ?practice 14 ?ccg})))
 
 #_(?- (hfs-delimited "./output/diabetes-drugs" :delimiter "," :sinkmode :replace)
       (diabetes-drugs
        (prescriptions/gp-prescriptions
-        (hfs-delimited "./input/prescriptions/pdpi" :delimiter ",")))
+        (hfs-delimited "./input/prescriptions/pdpi" :delimiter ","))
+       (ods/current-practices (hfs-delimited "./input/ods/gppractice/epraccur.csv" :delimiter ",")))
       (:trap (stdout)))
 
 (defn diabetes-spend-per-gp-per-month [diabetes-drugs]
@@ -64,7 +55,8 @@
       (diabetes-spend-per-gp-per-month
        (diabetes-drugs
         (prescriptions/gp-prescriptions
-         (hfs-delimited "./input/prescriptions/pdpi" :delimiter ","))))
+         (hfs-delimited "./input/prescriptions/pdpi" :delimiter ","))
+        (ods/current-practices (hfs-delimited "./input/ods/gppractice/epraccur.csv" :delimiter ","))))
       (:trap (stdout)))
 
 (defn spend-per-head [spend patients]
@@ -89,7 +81,8 @@
        (diabetes-spend-per-gp-per-month
         (diabetes-drugs
          (prescriptions/gp-prescriptions
-          (hfs-delimited "./input/prescriptions/pdpi" :delimiter ","))))
+          (hfs-delimited "./input/prescriptions/pdpi" :delimiter ","))
+         (ods/current-practices (hfs-delimited "./input/ods/gppractice/epraccur.csv" :delimiter ","))))
        (prevalence/diabetes-prevalence-gp
         (hfs-textline "./input/diabetes-prevalence/")))
       (:trap (stdout)))
@@ -103,7 +96,8 @@
       (diabetes-spend-per-ccg-per-month
        (diabetes-drugs
         (prescriptions/gp-prescriptions
-         (hfs-delimited "./input/prescriptions/pdpi" :delimiter ","))))
+         (hfs-delimited "./input/prescriptions/pdpi" :delimiter ","))
+        (ods/current-practices (hfs-delimited "./input/ods/gppractice/epraccur.csv" :delimiter ","))))
       (:trap (stdout)))
 
 (defn diabetes-spend-per-head-per-ccg-per-month [gp-spend gp-prevalence]
@@ -113,15 +107,16 @@
       (ops/sum ?gp-registered-patients :> ?ccg-registered-patients)
       (ops/sum ?gp-diabetes-patients :> ?ccg-diabetes-patients)
       (ops/sum ?gp-total-net-ingredient-cost :> ?ccg-total-net-ingredient-cost)
-      (has-patients? ?ccg-diabetes-patients)
       (spend-per-head ?ccg-total-net-ingredient-cost ?ccg-diabetes-patients :> ?spend-per-head)))
 
+;; sha,ccg_code,year,month,registered_patients,diaabetes_patients,total_spend,per_capita_spend
 #_(?- (hfs-delimited "./output/diabetes-per-head-per-ccg-per-month" :delimiter "," :sinkmode :replace)
       (diabetes-spend-per-head-per-ccg-per-month
        (diabetes-spend-per-gp-per-month
         (diabetes-drugs
          (prescriptions/gp-prescriptions
-          (hfs-delimited "./input/prescriptions/pdpi" :delimiter ","))))
+          (hfs-delimited "./input/prescriptions/pdpi" :delimiter ","))
+         (ods/current-practices (hfs-delimited "./input/ods/gppractice/epraccur.csv" :delimiter ","))))
        (prevalence/diabetes-prevalence-gp
         (hfs-textline "./input/diabetes-prevalence/")))
       (:trap (stdout)))
@@ -135,7 +130,8 @@
       (diabetes-spend-per-sha-per-month
        (diabetes-drugs
         (prescriptions/gp-prescriptions
-         (hfs-delimited "./input/prescriptions/pdpi" :delimiter ","))))
+         (hfs-delimited "./input/prescriptions/pdpi" :delimiter ","))
+        (ods/current-practices (hfs-delimited "./input/ods/gppractice/epraccur.csv" :delimiter ","))))
       (:trap (stdout)))
 
 
