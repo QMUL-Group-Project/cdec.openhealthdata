@@ -72,11 +72,11 @@
       (ops/limit [n] ?gp-code ?gp-name ?gp-percentage :> ?gp-code-out ?gp-name-out ?gp-percentage-out)))
 
 (defn top-n-per-ccg [input n order]
-  (<- [?ccg-code-out ?gp-code-out ?gp-prevalence-out]
+  (<- [?ccg-code-out ?gp-code-out ?gp-name-out ?gp-prevalence-out]
       (input :> ?gp-code ?gp-name ?gp-registered-patients ?gp-diabetes-patients ?gp-prevalence ?ccg-code-out ?ccg-name ?ccg-registered-patients ?ccg-diabetes-patients ?ccg-prevalence ?gp-ccg-prevalence)
       (:sort ?gp-prevalence)
       (:reverse order)
-      (ops/limit [n] ?gp-code ?gp-prevalence :> ?gp-code-out ?gp-prevalence-out)))
+      (ops/limit [n] ?gp-code ?gp-name ?gp-prevalence :> ?gp-code-out ?gp-name-out ?gp-prevalence-out)))
 
 (defn top-n-ccg [input n order]
   (<- [?ccg-code-out ?ccg-name-out ?ccg-registered-patients-out ?ccg-prevalence-out]
@@ -131,7 +131,7 @@
 ;; Number n of high and low GP surgeries per CCG
 #_(let [data-in1 "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"
         data-in2 "./input/list-of-proposed-practices-ccg.csv"
-        data-out "./output/high-low-surgeries-per-ccg/"]
+        data-out "./output/high-surgeries-per-ccg/"]
     (?- (hfs-delimited data-out :sinkmode :replace :delimiter ",")
         (top-n-per-ccg
          (gp-percentage-within-ccg
@@ -141,7 +141,7 @@
           (diabetes-prevalence-ccg
            (hfs-textline data-in2)
            (diabetes-prevalence-gp (hfs-textline data-in1))))
-         10 true)))
+         10 false)))
 
 ;; Top 10 GP surgeries in all England
 #_ (let [data-in "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"
