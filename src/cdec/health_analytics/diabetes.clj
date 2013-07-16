@@ -106,6 +106,26 @@
          (hfs-delimited "./input/prescriptions/pdpi" :delimiter ","))))
       (:trap (stdout)))
 
+(defn diabetes-spend-per-head-per-ccg-per-month [gp-spend gp-prevalence]
+  (<- [?sha ?ccg ?year ?month ?ccg-registered-patients ?ccg-diabetes-patients ?ccg-total-net-ingredient-cost ?spend-per-head]
+      (gp-spend :> ?sha ?ccg ?practice ?year ?month ?gp-total-net-ingredient-cost)
+      (gp-prevalence :> ?practice ?gp-name ?gp-registered-patients ?gp-diabetes-patients ?gp-prevalence)
+      (ops/sum ?gp-registered-patients :> ?ccg-registered-patients)
+      (ops/sum ?gp-diabetes-patients :> ?ccg-diabetes-patients)
+      (ops/sum ?gp-total-net-ingredient-cost :> ?ccg-total-net-ingredient-cost)
+      (has-patients? ?ccg-diabetes-patients)
+      (spend-per-head ?ccg-total-net-ingredient-cost ?ccg-diabetes-patients :> ?spend-per-head)))
+
+#_(?- (hfs-delimited "./output/diabetes-per-head-per-ccg-per-month" :delimiter "," :sinkmode :replace)
+      (diabetes-spend-per-head-per-ccg-per-month
+       (diabetes-spend-per-gp-per-month
+        (diabetes-drugs
+         (prescriptions/gp-prescriptions
+          (hfs-delimited "./input/prescriptions/pdpi" :delimiter ","))))
+       (prevalence/diabetes-prevalence-gp
+        (hfs-textline "./input/diabetes-prevalence/")))
+      (:trap (stdout)))
+
 (defn diabetes-spend-per-sha-per-month [diabetes-drugs]
   (<- [?sha ?year ?month ?total-net-ingredient-cost]
       (diabetes-drugs :#> 11 {0 ?sha 6 ?net-ingredient-cost 9 ?year 10 ?month})
