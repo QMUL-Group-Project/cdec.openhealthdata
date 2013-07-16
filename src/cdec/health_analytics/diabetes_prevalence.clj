@@ -1,4 +1,4 @@
-(ns cdec.health-analytics.diabetes_prevalence
+(ns cdec.health-analytics.diabetes-prevalence
   (:require [cascalog.api :refer :all]
             [cascalog.ops :as ops]
             [cascalog.tap :as tap]
