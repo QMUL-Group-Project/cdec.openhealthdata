@@ -17,7 +17,7 @@
       (math/floor)))
 
 (defn calculate-percentage [value1 value2]
-  (infof "Calculating percentage: %s %s" value1 value2)
+ ;; (infof "Calculating percentage: %s %s" value1 value2)
   (-> (/ value1 value2)
       (* 100)))
 
@@ -73,7 +73,7 @@
 
 (defn top-n-per-ccg [input n order]
   (<- [?ccg-code-out ?gp-code-out ?gp-prevalence-out]
-      (input :> ?gp-code ?gp-name ?gp-registered-patients ?gp-diabetes-patients ?gp-prevalence ?ccg-code-out ?ccg-name ?ccg-registered-patients ?ccg-diabetes-patients ?ccg-prevalence)
+      (input :> ?gp-code ?gp-name ?gp-registered-patients ?gp-diabetes-patients ?gp-prevalence ?ccg-code-out ?ccg-name ?ccg-registered-patients ?ccg-diabetes-patients ?ccg-prevalence ?gp-ccg-prevalence)
       (:sort ?gp-prevalence)
       (:reverse order)
       (ops/limit [n] ?gp-code ?gp-prevalence :> ?gp-code-out ?gp-prevalence-out)))
@@ -91,13 +91,13 @@
       (gp-ccg-mapping :> ?gp-code !!ccg-code !!ccg-name)))
 
 
-;; Prevalence per GP (gp_code, total_registered, total_prevalence, percentage)
+;; Prevalence per GP
 #_(let [data-out "./output/gp_prevalence/"
         data-in "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"]
     (?- (hfs-delimited data-out :sinkmode :replace :delimiter ",")
         (diabetes-prevalence-gp (hfs-textline data-in))))
 
-;; Prevalence per CCG (ccg_code, ccg_name, total_registered, total_prevalence, percentage)
+;; Prevalence per CCG
 #_(let [data-in1 "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"
         data-in2 "./input/list-of-proposed-practices-ccg.csv"
         data-out "./output/ccg_prevalence/"]
@@ -106,7 +106,7 @@
          (hfs-textline data-in2)
          (diabetes-prevalence-gp (hfs-textline data-in1)))))
 
-;; Left outer join of gp and ccg data (gp_code, ccg_code, gp_registered, gp_prevalence, gp_percentage)
+;; Left outer join of gp and ccg data
 #_ (let [data-in1 "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"
          data-in2 "./input/list-of-proposed-practices-ccg.csv"
          data-out "./output/gp-joined-with-ccg/"]
@@ -116,7 +116,6 @@
           (gp-ccg-mapping (hfs-textline data-in2)))))
 
 ;; Percentage of patients in each GP that constitutes patients in CCG
-;; (gp_code, gp_registered, gp_prevalence, gp_percentage, ccg_code, ccg_name, ccg_registered, ccg_prevalence, ccg_percentage)
 #_ (let [data-in1 "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"
          data-in2 "./input/list-of-proposed-practices-ccg.csv"
          data-out "./output/gp-ccg-prevalence/"]
