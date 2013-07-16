@@ -4,7 +4,8 @@
             [clojure.tools.logging :refer [infof errorf]]
             [cascalog.more-taps :refer [hfs-delimited]]
             [cdec.predicates :as pred]
-            [cdec.health-analytics.gp-prescriptions :as prescriptions]))
+            [cdec.health-analytics.gp-prescriptions :as prescriptions]
+            [cdec.health-analytics.diabetes-prevalence :as prevalence]))
 
 #_(use 'cascalog.playground)
 #_(bootstrap-emacs)
@@ -55,8 +56,8 @@
       (:trap (stdout)))
 
 (defn diabetes-spend-per-gp-per-month [diabetes-drugs]
-  (<- [?practice ?year ?month ?total-net-ingredient-cost]
-      (diabetes-drugs :#> 11 {2 ?practice 6 ?net-ingredient-cost 9 ?year 10 ?month})
+  (<- [?sha ?ccg ?practice ?year ?month ?total-net-ingredient-cost]
+      (diabetes-drugs :#> 11 {0 ?sha 1 ?ccg 2 ?practice 6 ?net-ingredient-cost 9 ?year 10 ?month})
       (ops/sum ?net-ingredient-cost :> ?total-net-ingredient-cost)))
 
 #_(?- (hfs-delimited "./output/diabetes-per-gppractice-per-month" :delimiter "," :sinkmode :replace)
@@ -64,6 +65,33 @@
        (diabetes-drugs
         (prescriptions/gp-prescriptions
          (hfs-delimited "./input/prescriptions/pdpi" :delimiter ","))))
+      (:trap (stdout)))
+
+(defn spend-per-head [spend patients]
+  (/ spend patients))
+
+(defn has-patients? [patients]
+  (> patients 0))
+
+(defn diabetes-spend-per-head-per-gp-per-month [gp-spend gp-prevalence]
+  (<- [?practice ?year ?month ?registered-patients ?diabetes-patients ?total-net-ingredient-cost ?spend-per-head]
+      (gp-spend :> ?sha ?ccg ?practice ?year ?month ?total-net-ingredient-cost)
+      (gp-prevalence :> ?practice ?gp-name ?registered-patients ?diabetes-patients ?prevalence)
+      (has-patients? ?diabetes-patients)
+      (spend-per-head ?total-net-ingredient-cost ?diabetes-patients :> ?spend-per-head)))
+
+
+;; prevalence data
+;; http://indicators.ic.nhs.uk/webview/index.jsp?v=2&submode=ddi&study=http%3A%2F%2Fhg-l-app-472.ic.green.net%3A80%2Fobj%2FfStudy%2FP01121&mode=documentation&top=yes
+;; https://indicators.ic.nhs.uk/download/Demography/Data/QOF1011_Pracs_Prevalence_DiabetesMellitus.xls
+#_(?- (hfs-delimited "./output/diabetes-per-head-per-gp-per-month" :delimiter "," :sinkmode :replace)
+      (diabetes-spend-per-head-per-gp-per-month
+       (diabetes-spend-per-gp-per-month
+        (diabetes-drugs
+         (prescriptions/gp-prescriptions
+          (hfs-delimited "./input/prescriptions/pdpi" :delimiter ","))))
+       (prevalence/diabetes-prevalence-gp
+        (hfs-textline "./input/diabetes-prevalence/")))
       (:trap (stdout)))
 
 (defn diabetes-spend-per-ccg-per-month [diabetes-drugs]
