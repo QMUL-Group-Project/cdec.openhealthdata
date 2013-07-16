@@ -70,11 +70,11 @@
       ))
 
 (defn top-n [input n order]
-  (<- [?gp-code-out ?gp-name-out ?gp-percentage-out]
+  (<- [?gp-code-out ?gp-name-out ?gp-registered-out ?gp-percentage-out]
       (input :> ?gp-code ?gp-name ?gp-registered ?gp-prevalence ?gp-percentage)
       (:sort ?gp-percentage)
       (:reverse order)
-      (ops/limit [n] ?gp-code ?gp-name ?gp-percentage :> ?gp-code-out ?gp-name-out ?gp-percentage-out)))
+      (ops/limit [n] ?gp-code ?gp-name ?gp-registered ?gp-percentage :> ?gp-code-out ?gp-name-out ?gp-percentage-out)))
 
 (defn top-n-per-ccg [input n order]
   (<- [?ccg-code-out ?gp-code-out ?gp-name-out ?gp-prevalence-out ?r]
