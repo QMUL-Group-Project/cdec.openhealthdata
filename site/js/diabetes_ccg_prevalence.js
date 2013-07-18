@@ -3,17 +3,13 @@ var ccg_diabetes_prevalence_map = function ccg_diabetes_prevalence_map(div_map, 
     var chart_svg;
     var map = L.map(div_map).setView([53.0, -1.5], 6);
     var color = function getColor(d) {
-        return d > 9 ? '#A50026' :
-            d > 8 ? '#D73027' :
-                d > 7 ? '#F46D43' :
-                    d > 6 ? '#FDAE61' :
-                        d > 5 ? '#FEE08B' :
-                            d > 4 ? '#D9EF8B' :
-                                d > 3 ? '#A6D96A' :
-                                    d > 2 ? '#66BD63' :
-                                        d > 1 ? '#1A9850' :
-                                            d > 0 ? '#006837' :
-                                                '#BABABA';
+        return d > 9 ? '#0C2C84' :
+            d > 7 ? '#225EA8' :
+            d > 5 ? '#1D91C0' :
+            d > 3 ? '#41B6C4' :
+            d > 1 ? '#7FCDBB' :
+            d > 0 ? '#C7E9B4' :
+            '#FFFFCC';
     };
     var style = function style(feature) {
         return {
@@ -62,7 +58,7 @@ var ccg_diabetes_prevalence_map = function ccg_diabetes_prevalence_map(div_map, 
 
     mergedFeatureLayer(map, "data/gp_ccg_prevalence.csv", "data/ccg-boundaries.json", "ccg_code", style, onEachFeature, pointToLayer, "ccg_boundaries");
 
-    addLegend([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], map, color);
+    addLegend([0, 1, 3, 5, 7, 9], map, color);
 
     addInfo(map, function (props) {
         var infoBox = '<h3> CCG Diabetes Prevalence </h3><br/>' +

@@ -4,13 +4,13 @@ var diabetes_per_head_per_ccg_per_month = function diabetes_per_head_per_ccg_per
     var color = function getColor(d) {
         return  d == 'NA' ? '#333' :
             d == 'undefined' ? '#333' :
-            d > 30 ? '#91003F' :
-            d > 28 ? '#CE1256' :
-            d > 26 ? '#E7298A' :
-            d > 24 ? '#DF65B0' :
-            d > 22 ? '#C994C7' :
-            d > 20 ? '#D4B9DA' :
-            '#F1EEF6';
+            d > 30 ? '#0C2C84' :
+            d > 28 ? '#225EA8' :
+            d > 26 ? '#1D91C0' :
+            d > 24 ? '#41B6C4' :
+            d > 22 ? '#7FCDBB' :
+            d > 20 ? '#C7E9B4' :
+            '#FFFFCC';
     };
     var style = function style(feature) {
         return {

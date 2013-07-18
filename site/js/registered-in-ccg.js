@@ -4,13 +4,13 @@ var registered_in_ccg = function registered_in_ccg(div) {
     var color = function getColor(d) {
         return  d == 'NA' ? '#333' :
             d == 'undefined' ? '#333' :
-            d > 850000 ? '#91003F' :
-            d > 750000 ? '#CE1256' :
-            d > 500000 ? '#E7298A' :
-            d > 250000 ? '#DF65B0' :
-            d > 100000 ? '#C994C7' :
-            d > 50000 ? '#D4B9DA' :
-            '#F1EEF6';
+            d > 850000 ? '#0C2C84' :
+            d > 750000 ? '#225EA8' :
+            d > 500000 ? '#1D91C0' :
+            d > 250000 ? '#41B6C4' :
+            d > 100000 ? '#7FCDBB' :
+            d > 50000 ? '#C7E9B4' :
+            '#FFFFCC';
     };
     var style = function style(feature) {
         return {
