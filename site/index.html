@@ -80,14 +80,14 @@
         border-radius: 0 3px 3px 0;
       }
       #spendmap {
-            width: 900px;
+            width: 960px;
             height: 600px;
-            margin: 30px 20px;
+            margin: 0px 20px;
       }
       #prevalencemap {
-            width: 900px;
+            width: 600px;
             height: 600px;
-            margin: 30px 20px;
+            margin: 0px 20px;
       }
     </style>
     <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
@@ -143,19 +143,24 @@
       <div class="row">
         <div class="span12">
           <h2>Diabetes Prevalence</h2>
+        </div>
+        <div class="span8">
           <div id="prevalencemap"></div>
         </div>
-      </div>
-      <div class="row">
-        <div class="span12">
-          <h2>Top 10 CCGs</h2>
-          <div id="top10"></div>
+        <div class="span4">
+          <div id="gp_prevalence"></div>
         </div>
       </div>
       <div class="row">
         <div class="span12">
-          <h2>Bottom 10 CCGs</h2>
-          <div id="bottom10"></div>
+          <h2>10 CCGs with lowest prevalence of Diabetes</h2>
+          <div id="lowest"></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="span12">
+          <h2>10 CCGs with highest prevalence of Diabetes</h2>
+          <div id="highest"></div>
         </div>
       </div>
       
@@ -191,14 +196,14 @@
     <script src="js/diabetes-per-head-per-ccg-per-month.js"></script>
     <!-- top and bottom 10 -->
     <script src="js/diabetes_ccg_ranking.js"></script>
-    <!-- Prevalence Map -->
-    <script src="js/diabetes_gp_prevalence.js"></script>
+    <!-- CCG Prevalence Map -->
+    <script src="js/diabetes_ccg_prevalence.js"></script>
     <!-- put it all on a page -->
     <script type="text/javascript">
       diabetes_per_head_per_ccg_per_month('spendmap');
-      //diabetes_prevalence_map('prevalencemap');
-      diabetes_ccg_ranking_top_10('#top10');
-      diabetes_ccg_ranking_bottom_10('#bottom10');
+      ccg_diabetes_prevalence_map('prevalencemap', '#gp_prevalence');
+      diabetes_ccg_ranking_top_10('#lowest');
+      diabetes_ccg_ranking_bottom_10('#highest');
     </script>
   </body>
 </html>
