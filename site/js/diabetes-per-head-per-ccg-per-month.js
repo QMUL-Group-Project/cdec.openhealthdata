@@ -61,12 +61,12 @@ var diabetes_per_head_per_ccg_per_month = function diabetes_per_head_per_ccg_per
     addLegend([0, 20, 22, 24, 26, 28, 30, 34], map, color);
 
     addInfo(map, function (props) {
-        var infoBox = '<h3> CCG Population </h3><br/>' +
+        var infoBox = '<h3>Diabetes Spend per CCG</h3><br/>' +
             'CCG code: ' + props.ccg_code + '<br/>'
-            + 'Registered Patients: ' + props.registered_patients + '<br/>'
-            + 'Diabetes Patients: ' + props.diabetes_patients + '<br/>'
-            + 'Total Spend: ' + props.total_spend + '<br/>'
-            + 'Per Capita Spend: ' + props.per_capita_spend ;
+            + 'Registered Patients: ' + numeral(props.registered_patients).format('0,0') + '<br/>'
+            + 'Diabetes Patients: ' + numeral(props.diabetes_patients).format('0,0') + '<br/>'
+            + 'Total Spend: £' + numeral(props.total_spend).format('0,0.00') + '<br/>'
+            + 'Spend per diabetes patient: £' + numeral(props.per_capita_spend).format('0,0.00');
         return infoBox;
     });
 
