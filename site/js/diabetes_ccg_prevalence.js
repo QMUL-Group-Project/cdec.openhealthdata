@@ -85,6 +85,38 @@ var ccg_diabetes_prevalence_map = function ccg_diabetes_prevalence_map(div_map, 
         e.target._map.info.update(layer.feature.properties);
         var ccg_code = e.target.feature.properties.ccg_code;
 
+        // /* Sidebar chart */
+        // chart_svg = dimple.newSvg(div_sidebar, 300, 300);
+        // d3.csv("./data/ranking_ccg_bottom10_gp.csv", function (data) {
+        //     data = dimple.filterData(data, "CCG Code", [ccg_code]);
+        //     var sidechart = new dimple.chart(chart_svg, data);
+        //     sidechart.setBounds(60, 30, 200, 200)
+        //     var x = sidechart.addCategoryAxis("x", "Practice Code");
+        //     x.addOrderRule("Date");
+        //     sidechart.addMeasureAxis("y", "GP Prevalence");
+        //     sidechart.addSeries(["Practice Code", "Practice Name"], dimple.plot.bar);
+        //     sidechart.draw();
+        // });
+    }
+
+    function resetHighlight(e) {
+        var layer = e.target;
+        layer.setStyle(style(e.target.feature));
+        e.target._map.info.update();
+
+        // Remove sidebar chart on mouse out
+        //chart_svg.remove();
+
+    }
+
+    function zoomToFeature(e) {
+        e.target._map.fitBounds(e.target.getBounds());
+
+        if (chart_svg) { chart_svg.remove() };
+
+        e.target._map.info.update(e.target.feature.properties);
+        var ccg_code = e.target.feature.properties.ccg_code;
+        
         /* Sidebar chart */
         chart_svg = dimple.newSvg(div_sidebar, 300, 300);
         d3.csv("./data/ranking_ccg_bottom10_gp.csv", function (data) {
@@ -97,19 +129,5 @@ var ccg_diabetes_prevalence_map = function ccg_diabetes_prevalence_map(div_map, 
             sidechart.addSeries(["Practice Code", "Practice Name"], dimple.plot.bar);
             sidechart.draw();
         });
-    }
-
-    function resetHighlight(e) {
-        var layer = e.target;
-        layer.setStyle(style(e.target.feature));
-        e.target._map.info.update();
-
-        // Remove sidebar chart on mouse out
-        chart_svg.remove();
-
-    }
-
-    function zoomToFeature(e) {
-        e.target._map.fitBounds(e.target.getBounds());
     }
 }
