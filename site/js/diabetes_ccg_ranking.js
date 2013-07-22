@@ -54,10 +54,7 @@ var diabetes_ccg_ranking_top_10 = function diabetes_ccg_ranking_top_10(div) {
                 .attr("width", textLength.width + 75)
                 .attr("height", height)
                 .attr("rx", 5)
-                .attr("ry", 5)
-                .style("fill", 'white')
-                .style("stroke", '#41B6C4')
-                .style("stroke-width", 2);
+                .attr("ry", 5);
 
             // Add multiple lines of text
             popup
@@ -157,9 +154,6 @@ var diabetes_ccg_ranking_bottom_10 = function diabetes_ccg_ranking_bottom_10(div
                 .attr("height", height)
                 .attr("rx", 5)
                 .attr("ry", 5)
-                .style("fill", 'white')
-                .style("stroke", '#41B6C4')
-                .style("stroke-width", 2);
 
             // Add multiple lines of text
             popup
