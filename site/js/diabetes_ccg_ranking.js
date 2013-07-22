@@ -49,6 +49,7 @@ var diabetes_ccg_ranking_top_10 = function diabetes_ccg_ranking_top_10(div) {
             // Add a rectangle surrounding the text
             popup
                 .append("rect")
+                .attr("id", "tooltip")
                 .attr("x", x + 5)
                 .attr("y", y - 5)
                 .attr("width", textLength.width + 75)
@@ -148,6 +149,7 @@ var diabetes_ccg_ranking_bottom_10 = function diabetes_ccg_ranking_bottom_10(div
             // Add a rectangle surrounding the text
             popup
                 .append("rect")
+                .attr("id", "tooltip")
                 .attr("x", x + 5)
                 .attr("y", y - 5)
                 .attr("width", textLength.width + 75)

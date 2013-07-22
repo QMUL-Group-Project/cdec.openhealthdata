@@ -84,20 +84,18 @@
 
 rect {
     stroke: #41B6C4;
+    fill: #41B6C4;
+}
+
+rect#tooltip {
+    stroke: #41B6C4;
     stroke-width: 2;
     fill: white;
-    font-family: sans-serif;
-    font-size: 8;
 }
 
 circle {
   stroke: #41B6C4;
   fill: #41B6C4;
-}
-
-tspan {
-    font-family: sans-serif;
-    font-size: 9;
 }
 
 div#tooltip {
