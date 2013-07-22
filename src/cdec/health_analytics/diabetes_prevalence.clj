@@ -136,7 +136,7 @@
 ;; Number n of high and low GP surgeries per CCG
 #_(let [data-in1 "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"
         data-in2 "./input/list-of-proposed-practices-ccg.csv"
-        data-out "./output/high-surgeries-per-ccg/"]
+        data-out "./output/low-surgeries-per-ccg/"]
     (?- (hfs-delimited data-out :sinkmode :replace :delimiter ",")
         (top-n-per-ccg
          (gp-percentage-within-ccg
@@ -147,6 +147,21 @@
            (hfs-textline data-in2)
            (diabetes-prevalence-gp (hfs-textline data-in1))))
          10 false)))
+
+;; Number n of high and low GP surgeries per CCG
+#_(let [data-in1 "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"
+        data-in2 "./input/list-of-proposed-practices-ccg.csv"
+        data-out "./output/high-surgeries-per-ccg/"]
+    (?- (hfs-delimited data-out :sinkmode :replace :delimiter ",")
+        (top-n-per-ccg
+         (gp-percentage-within-ccg
+          (join-gp-with-ccg
+           (diabetes-prevalence-gp (hfs-textline data-in1))
+           (gp-ccg-mapping (hfs-textline data-in2)))
+          (diabetes-prevalence-ccg
+           (hfs-textline data-in2)
+           (diabetes-prevalence-gp (hfs-textline data-in1))))
+         10 true)))
 
 ;; Top 10 GP surgeries in all England
 #_ (let [data-in "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"

@@ -16,9 +16,81 @@
   stroke-width: 2;
 }
 
+.mycluster {
+    width: 40px;
+    height: 40px;
+    line-height: 80px;
+    background-color: lightcyan;
+    border: 1px solid lightcyan;
+    border-radius: 50%;
+    box-shadow: 1px 1px 1px grey;
+    color: black;
+    min-width: 9px;
+    text-align: center;
+    font: 9px Helvetica, Verdana, Tahoma;
+}
+
+.myDefaultIcon {
+    background: grey;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid black;
+}
+
+.iconA {
+    background: #F0F9E8;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid black;
+}
+.iconB {
+    background: #CCEBC5;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid black;
+}
+.iconC {
+    background: #A8DDB5;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid black;
+}
+.iconD {
+    background: #7BCCC4;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid black;
+}
+.iconE {
+    background: #43A2CA;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid black;
+}
+.iconF {
+    background: #0868AC;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid black;
+}
+
+
 rect {
     stroke: #41B6C4;
     fill: #41B6C4;
+}
+
+rect#tooltip {
+    stroke: #41B6C4;
+    stroke-width: 2;
+    fill: white;
 }
 
 circle {

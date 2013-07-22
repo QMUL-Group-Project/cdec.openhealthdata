@@ -89,6 +89,11 @@
             height: 600px;
             margin: 0px 20px;
       }
+      #clustered {
+            width: 960px;
+            height: 600px;
+            margin: 0px 20px;
+      }
     </style>
     <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 
@@ -138,6 +143,12 @@
           <div id="spendmap"></div>
         </div>
       </div>
+        <div class="row">
+            <div class="span12">
+                <h2>Diabetes prevalence per GP practice</h2>
+                <div id="clustered"></div>
+            </div>
+        </div>
       <div class="row">
         <div class="span12">
           <h2>10 CCGs with lowest prevalence of Diabetes</h2>
@@ -173,6 +184,7 @@
     <!-- leaflet -->
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.2/leaflet.css" />
     <script src="http://cdn.leafletjs.com/leaflet-0.6.2/leaflet.js"></script>
+    <script src="./js/leaflet.markercluster-src.js"></script>
     <!--[if lte IE 8]>
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.2/leaflet.ie.css" />
     <![endif]-->
@@ -181,18 +193,23 @@
     <script src="js/mapProcessing.js"></script>
     <link href="css/charts.css" rel="stylesheet" type="text/css">
     <link href="css/legend.css" rel="stylesheet" type="text/css">
+    <link href="./css/MarkerCluster.css" rel="stylesheet" type="text/css"/>
+    <link href="./css/MarkerCluster.Default.css" rel="stylesheet" type="text/css"/>
     <!-- spend per ccg map -->
     <script src="js/diabetes-per-head-per-ccg-per-month.js"></script>
     <!-- top and bottom 10 -->
     <script src="js/diabetes_ccg_ranking.js"></script>
     <!-- CCG Prevalence Map -->
     <script src="js/diabetes_ccg_prevalence.js"></script>
+    <!-- Diabetes prevalence per GP clustered -->
+    <script src="js/diabetes_gp_prevalence_clustered.js"></script>
     <!-- put it all on a page -->
     <script type="text/javascript">
       diabetes_per_head_per_ccg_per_month('spendmap');
       ccg_diabetes_prevalence_map('prevalencemap', '#gp_prevalence');
       diabetes_ccg_ranking_top_10('#lowest');
       diabetes_ccg_ranking_bottom_10('#highest');
+      diabetes_gp_prevalence_map('clustered');
     </script>
   </body>
 </html>

@@ -43,6 +43,60 @@ var mergedFeatureLayer = function mergedFeatureLayer(map, csvDir, jsonDir, joinF
     });
 };
 
+var mergedClusteredMarkers = function mergedClusteredMarkers(map, csvDir, jsonDir, joinFieldKey, style, onEachFeature, pointToLayer, featureObject, iconFeature, addPopup, getCustomIcon) {
+
+    var buildingData = $.Deferred();
+
+    d3.csv(csvDir, function (csv) {
+
+        if (csv) {
+            $.ajax(
+                {
+                    url: jsonDir,
+                    async: false,
+                    data: 'json',
+
+                    success: function (data) {
+                        var pcts = topojson.feature(data, data.objects[featureObject])
+                        features = pcts.features;
+                        data.features = processData(csv, features, joinFieldKey);
+                        buildingData.resolve(data);
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        console.log(xhr.status + " - " + thrownError);
+                    }
+                });
+        }
+        else {
+            console.log("Error loading CSV data");
+        }
+    });
+
+    buildingData.done(function (d) {
+        var markers = new L.MarkerClusterGroup({
+            maxClusterRadius: 25,
+            disableClusteringAtZoom: 10,
+            iconCreateFunction: function (cluster) {
+                return L.divIcon({ html: cluster.getChildCount(), className: 'mycluster', iconSize: L.point(20, 20) });
+            },
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: true
+        });
+
+        for (var i = 0; i < d.features.length; i++) {
+            var a = d.features[i].geometry.coordinates;
+            var properties = d.features[i].properties;
+            var marker = new L.Marker(new L.LatLng(a[1], a[0]), {
+                icon: getCustomIcon(properties[iconFeature]) });
+            marker.bindPopup(addPopup(properties));
+            markers.addLayer(marker);
+        }
+        markers.addTo(map);
+    });
+};
+
+
 function processData(csvData, features, joinKey) {
 
     var joinFieldObject = {};
@@ -140,6 +194,7 @@ function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+/* Function that is used to estimate the width of the custom tooltip */
 function measureText(pText, pFontSize, pStyle) {
     var lDiv = document.createElement('lDiv');
 
