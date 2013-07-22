@@ -20,10 +20,10 @@
     width: 40px;
     height: 40px;
     line-height: 80px;
-    background-color: lightblue;
-    border: 1px solid darkslategrey;
+    background-color: lightcyan;
+    border: 1px solid lightcyan;
     border-radius: 50%;
-    box-shadow: 1px 1px 1px black;
+    box-shadow: 1px 1px 1px grey;
     color: black;
     min-width: 9px;
     text-align: center;
@@ -35,43 +35,50 @@
     width: 10px;
     height: 10px;
     border-radius: 50%;
+    border: 1px solid black;
 }
 
 .iconA {
-    background: #1A9850;
+    background: #F0F9E8;
     width: 10px;
     height: 10px;
     border-radius: 50%;
+    border: 1px solid black;
 }
 .iconB {
-    background: #91CF60;
+    background: #CCEBC5;
     width: 10px;
     height: 10px;
     border-radius: 50%;
+    border: 1px solid black;
 }
 .iconC {
-    background: #D9EF8B;
+    background: #A8DDB5;
     width: 10px;
     height: 10px;
     border-radius: 50%;
+    border: 1px solid black;
 }
 .iconD {
-    background: #FEE08B;
+    background: #7BCCC4;
     width: 10px;
     height: 10px;
     border-radius: 50%;
+    border: 1px solid black;
 }
 .iconE {
-    background: #FC8D59;
+    background: #43A2CA;
     width: 10px;
     height: 10px;
     border-radius: 50%;
+    border: 1px solid black;
 }
 .iconF {
-    background: #D73027;
+    background: #0868AC;
     width: 10px;
     height: 10px;
     border-radius: 50%;
+    border: 1px solid black;
 }
 
 
