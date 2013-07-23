@@ -116,18 +116,28 @@ var ccg_diabetes_prevalence_map = function ccg_diabetes_prevalence_map(div_map, 
 
         e.target._map.info.update(e.target.feature.properties);
         var ccg_code = e.target.feature.properties.ccg_code;
-        
+
         /* Sidebar chart */
-        chart_svg = dimple.newSvg(div_sidebar, 300, 300);
+        chart_svg = dimple.newSvg(div_sidebar, 400, 500);
         d3.csv("./data/ranking_ccg_bottom10_gp.csv", function (data) {
             data = dimple.filterData(data, "CCG Code", [ccg_code]);
             var sidechart = new dimple.chart(chart_svg, data);
-            sidechart.setBounds(60, 30, 200, 200)
-            var x = sidechart.addCategoryAxis("x", "Practice Code");
+            sidechart.setBounds(60, 30, 200, 300);
+            sidechart.defaultColors = [
+                new dimple.color("#FFFFCC"),
+                new dimple.color("#FFFFCC"),
+                new dimple.color("#FFFFCC"),
+                new dimple.color("#FFFFCC"),
+                new dimple.color("#FFFFCC")
+            ];
+            var x = sidechart.addCategoryAxis("x", "Practice Name");
             x.addOrderRule("Date");
+            //sidechart.axes[0].attr("transform", "rotate(-45)");
             sidechart.addMeasureAxis("y", "GP Prevalence");
             sidechart.addSeries(["Practice Code", "Practice Name"], dimple.plot.bar);
             sidechart.draw();
+            sidechart.svg.selectAll("g")
+            x.shapes.selectAll("text").remove();
         });
     }
 }

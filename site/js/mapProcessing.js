@@ -77,7 +77,11 @@ var mergedClusteredMarkers = function mergedClusteredMarkers(map, csvDir, jsonDi
             maxClusterRadius: 25,
             disableClusteringAtZoom: 10,
             iconCreateFunction: function (cluster) {
-                return L.divIcon({ html: cluster.getChildCount(), className: 'mycluster', iconSize: L.point(20, 20) });
+                return L.divIcon({
+                    html: '<span style="display:inline-block; vertical-align:middle">'+ cluster.getChildCount()+' </span>',
+                    className: 'mycluster',
+                    iconSize: null
+                });
             },
             spiderfyOnMaxZoom: true,
             showCoverageOnHover: false,

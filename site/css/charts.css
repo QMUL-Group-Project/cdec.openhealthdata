@@ -17,9 +17,9 @@
 }
 
 .mycluster {
-    width: 40px;
-    height: 40px;
-    line-height: 80px;
+    width: 17px;
+    height: 17px;
+    line-height: 30px;
     background-color: lightcyan;
     border: 1px solid lightcyan;
     border-radius: 50%;
@@ -27,7 +27,8 @@
     color: black;
     min-width: 9px;
     text-align: center;
-    font: 9px Helvetica, Verdana, Tahoma;
+    margin: auto;
+    font: 10px Helvetica, Verdana, Tahoma;
 }
 
 .myDefaultIcon {
