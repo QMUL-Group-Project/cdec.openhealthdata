@@ -134,7 +134,7 @@ var ccg_diabetes_prevalence_map = function ccg_diabetes_prevalence_map(div_map, 
             sidechart.draw();
             sidechart.svg.selectAll("g")
             // Override x-axis title
-            x.titleShape.text("Practice Name");
+            x.titleShape.text("GP Surgery");
             // Title is placed below the tick labels by default. This overrides this setting and places it immediately below the axis.
             x.titleShape.attr("y", sidechart.height + 55);
             // Remove tick labels on x-axis
