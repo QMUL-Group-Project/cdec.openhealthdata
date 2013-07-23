@@ -109,6 +109,23 @@
       (ops/sum ?gp-total-net-ingredient-cost :> ?ccg-total-net-ingredient-cost)
       (spend-per-head ?ccg-total-net-ingredient-cost ?ccg-diabetes-patients :> ?spend-per-head)))
 
+(defn mean-spend-per-head [input]
+  (<- [?mean-spend]
+      (input :> ?sha ?ccg ?year ?month ?ccg-registered-patients ?ccg-diabetes-patients ?ccg-total-net-ingredient-cost ?spend-per-head)
+      (ops/avg ?spend-per-head :> ?mean-spend)))
+
+;; Mean spend per head of diabetes
+#_ (?- (stdout)
+       (mean-spend-per-head-england
+        (diabetes-spend-per-head-per-ccg-per-month
+          (diabetes-spend-per-gp-per-month
+        (diabetes-drugs
+         (prescriptions/gp-prescriptions
+          (hfs-delimited "./input/prescriptions/pdpi" :delimiter ","))
+         (ods/current-practices (hfs-delimited "./input/ods/gppractice/epraccur.csv" :delimiter ","))))
+       (prevalence/diabetes-prevalence-gp
+        (hfs-textline "./input/diabetes-prevalence/")))))
+
 ;; sha,ccg_code,year,month,registered_patients,diaabetes_patients,total_spend,per_capita_spend
 #_(?- (hfs-delimited "./output/diabetes-per-head-per-ccg-per-month" :delimiter "," :sinkmode :replace)
       (diabetes-spend-per-head-per-ccg-per-month
