@@ -49,6 +49,19 @@
       (tl/parse-double ?diabetes-patients-string :> ?diabetes-patients)
       (tl/parse-double ?prevalence-string :> ?prevalence)))
 
+(defn total-diabetes-patients [input]
+  (<- [?registered-patients ?diabetes-patients ?prevalence]
+      (input :> ?gp-code ?gp-name ?gp-registered-patients ?gp-diabetes-patients ?gp-prevalence)
+      (ops/sum ?gp-registered-patients :> ?registered-patients-exp)
+      (long ?registered-patients-exp :> ?registered-patients)
+      (ops/sum ?gp-diabetes-patients :> ?diabetes-patients)
+      (calculate-percentage ?diabetes-patients ?registered-patients :> ?prevalence)))
+
+(defn mean-prevalence-gp [input]
+  (<- [?mean-prevalence]
+      (input :> ?gp-code ?gp-name ?registered-patients ?diabetes-patients ?prevalence)
+      (ops/avg ?prevalence :> ?mean-prevalence)))
+
 (defn diabetes-prevalence-ccg [ccg-gp-list gp-prevalence]
   (<- [?ccg-code ?ccg-name ?ccg-registered-patients ?ccg-diabetes-patients ?ccg-prevalence]
       (gp-prevalence :> ?gp-code ?gp-name ?gp-registered-patients ?gp-diabetes-patients _)
@@ -61,6 +74,11 @@
       (ops/sum ?gp-registered-patients :> ?ccg-registered-patients)
       (ops/sum ?gp-diabetes-patients :> ?ccg-diabetes-patients)
       (calculate-percentage ?ccg-diabetes-patients ?ccg-registered-patients :> ?ccg-prevalence)))
+
+(defn mean-prevalence-ccg [input]
+  (<- [?mean-prevalence]
+      (input :> ?ccg-code ?ccg-name ?ccg-registered-patients ?ccg-diabetes-patients ?ccg-prevalence)
+      (ops/avg ?ccg-prevalence :> ?mean-prevalence)))
 
 (defn gp-percentage-within-ccg [gp-join-ccg-prevalence ccg-prevalence]
   (<- [?gp-code ?gp-name ?gp-registered-patients ?gp-diabetes-patients ?gp-prevalence ?ccg-code ?ccg-name ?ccg-registered-patients ?ccg-diabetes-patients ?ccg-prevalence ?gp-ccg-prevalence]
@@ -110,6 +128,27 @@
         (diabetes-prevalence-ccg
          (hfs-textline data-in2)
          (diabetes-prevalence-gp (hfs-textline data-in1)))))
+
+;; Total number of diabetes patients in England and prevalence
+#_ (let [data-in "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"]
+     (?- (stdout)
+         (total-diabetes-patients
+          (diabetes-prevalence-gp (hfs-textline data-in)))))
+
+;; Average diabetes prevalence per GP
+#_ (let [data-in "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"]
+     (?- (stdout)
+         (mean-prevalence-gp
+          (diabetes-prevalence-gp (hfs-textline data-in)))))
+
+;; Average diabetes prevalence per CCG
+#_ (let [data-in1 "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"
+         data-in2 "./input/list-of-proposed-practices-ccg.csv"]
+     (?- (stdout)
+         (mean-prevalence-ccg
+          (diabetes-prevalence-ccg
+           (hfs-textline data-in2)
+           (diabetes-prevalence-gp (hfs-textline data-in1))))))
 
 ;; Left outer join of gp and ccg data
 #_ (let [data-in1 "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"
