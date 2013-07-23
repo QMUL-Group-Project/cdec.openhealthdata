@@ -31,7 +31,6 @@ var ccg_diabetes_prevalence_map = function ccg_diabetes_prevalence_map(div_map, 
         };
     };
     var pointToLayer = function pointToLayer(feature, latlng) {
-        // e.layer.bindPopup('<h4>Hello ' + e.properties.name + '!</h4>');
         return L.circleMarker(latlng, {
             radius: 8,
             fillColor: "#ff7800",
@@ -64,8 +63,8 @@ var ccg_diabetes_prevalence_map = function ccg_diabetes_prevalence_map(div_map, 
         var infoBox = '<h3> CCG Diabetes Prevalence </h3><br/>' +
             'CCG Name: '+ props.ccg_name +  '<br />' +
             'CCG Code: ' + props.ccg_code + '<br />' +
-            'Registered Patients: ' + numberWithCommas(Math.round(props.ccg_registered_patients)) + '<br />' +
-            'Prevalence: ' + Math.round(props.ccg_prevalence * 10) / 10 + '%<br />';
+            'Registered Patients: ' + numeral(props.ccg_registered_patients).format('0,0') + '<br />' +
+            'Prevalence: ' + numeral(props.ccg_prevalence).format('0,0.00') + '%<br />';
         return infoBox;
     });
 
@@ -83,30 +82,12 @@ var ccg_diabetes_prevalence_map = function ccg_diabetes_prevalence_map(div_map, 
             layer.bringToFront();
         }
         e.target._map.info.update(layer.feature.properties);
-        var ccg_code = e.target.feature.properties.ccg_code;
-
-        // /* Sidebar chart */
-        // chart_svg = dimple.newSvg(div_sidebar, 300, 300);
-        // d3.csv("./data/ranking_ccg_bottom10_gp.csv", function (data) {
-        //     data = dimple.filterData(data, "CCG Code", [ccg_code]);
-        //     var sidechart = new dimple.chart(chart_svg, data);
-        //     sidechart.setBounds(60, 30, 200, 200)
-        //     var x = sidechart.addCategoryAxis("x", "Practice Code");
-        //     x.addOrderRule("Date");
-        //     sidechart.addMeasureAxis("y", "GP Prevalence");
-        //     sidechart.addSeries(["Practice Code", "Practice Name"], dimple.plot.bar);
-        //     sidechart.draw();
-        // });
     }
 
     function resetHighlight(e) {
         var layer = e.target;
         layer.setStyle(style(e.target.feature));
         e.target._map.info.update();
-
-        // Remove sidebar chart on mouse out
-        //chart_svg.remove();
-
     }
 
     function zoomToFeature(e) {
@@ -125,7 +106,7 @@ var ccg_diabetes_prevalence_map = function ccg_diabetes_prevalence_map(div_map, 
             sidechart.setBounds(60, 30, 200, 300);
             // Override tooltip colour
             sidechart.defaultColors = [
-                new dimple.color("#E0FFFF"),
+                new dimple.color("#E0FFFF")
             ];
             var x = sidechart.addCategoryAxis("x", "Practice Code");
 
