@@ -29,6 +29,9 @@
         (hfs-delimited "./input/prescriptions/pdpi" :delimiter ",")))
       (:trap (stdout)))
 
+;; Data files from:
+;; http://www.hscic.gov.uk/searchcatalogue?q=title:%22GP+Practice+Prescribing+Presentation-Level+Data%22&area=&size=100&sort=Relevance
+
 ;; 0 sha
 ;; 1 pct
 ;; 2 practice
