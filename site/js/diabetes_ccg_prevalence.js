@@ -125,7 +125,7 @@ var ccg_diabetes_prevalence_map = function ccg_diabetes_prevalence_map(div_map, 
             sidechart.setBounds(60, 30, 200, 300);
             // Override tooltip colour
             sidechart.defaultColors = [
-                new dimple.color("#FFFFCC"),
+                new dimple.color("#E0FFFF"),
             ];
             var x = sidechart.addCategoryAxis("x", "Practice Code");
 
