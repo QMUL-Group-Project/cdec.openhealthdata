@@ -123,20 +123,19 @@ var ccg_diabetes_prevalence_map = function ccg_diabetes_prevalence_map(div_map, 
             data = dimple.filterData(data, "CCG Code", [ccg_code]);
             var sidechart = new dimple.chart(chart_svg, data);
             sidechart.setBounds(60, 30, 200, 300);
+            // Override tooltip colour
             sidechart.defaultColors = [
                 new dimple.color("#FFFFCC"),
-                new dimple.color("#FFFFCC"),
-                new dimple.color("#FFFFCC"),
-                new dimple.color("#FFFFCC"),
-                new dimple.color("#FFFFCC")
             ];
-            var x = sidechart.addCategoryAxis("x", "Practice Name");
-            x.addOrderRule("Date");
-            //sidechart.axes[0].attr("transform", "rotate(-45)");
+            var x = sidechart.addCategoryAxis("x", "Practice Code");
+
             sidechart.addMeasureAxis("y", "GP Prevalence");
-            sidechart.addSeries(["Practice Code", "Practice Name"], dimple.plot.bar);
+            sidechart.addSeries(["Practice Name", "Practice Code"], dimple.plot.bar);
             sidechart.draw();
             sidechart.svg.selectAll("g")
+            // Override x-axis label
+            x.titleShape.text("Practice Name");
+            // Remove tick labels on x-axis
             x.shapes.selectAll("text").remove();
         });
     }
