@@ -108,14 +108,19 @@ var ccg_diabetes_prevalence_map = function ccg_diabetes_prevalence_map(div_map, 
             sidechart.defaultColors = [
                 new dimple.color("#E0FFFF")
             ];
-            var x = sidechart.addCategoryAxis("x", "Practice Code");
 
-            sidechart.addMeasureAxis("y", "GP Prevalence");
+            var x = sidechart.addCategoryAxis("x", "Practice Code");
+            var y = sidechart.addMeasureAxis("y", "GP Prevalence");
+            
             sidechart.addSeries(["Practice Name", "Practice Code"], dimple.plot.bar);
             sidechart.draw();
             sidechart.svg.selectAll("g")
+
+            // Override y-axis title
+            y.titleShape.text ("% of patients with diabetes");
+            
             // Override x-axis title
-            x.titleShape.text("GP Surgery");
+            x.titleShape.text("GP Surgeries with the highest prevalence");
             // Title is placed below the tick labels by default. This overrides this setting and places it immediately below the axis.
             x.titleShape.attr("y", sidechart.height + 55);
             // Remove tick labels on x-axis
