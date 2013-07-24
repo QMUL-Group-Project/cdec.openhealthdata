@@ -99,6 +99,19 @@ circle {
   fill: #41B6C4;
 }
 
+circle#ring {
+    stroke: #41B6C4;
+    fill: none;
+    stroke-width: 1;
+}
+
+line#drop {
+    fill: none;
+    stroke: #41B6C4;
+    stroke-width: 2;
+    stroke-dasharray: 3, 3;
+}
+
 div#tooltip {
       position: absolute;
       width: auto;
