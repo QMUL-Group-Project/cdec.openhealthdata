@@ -29,7 +29,8 @@ var diabetes_ccg_ranking_top_10 = function diabetes_ccg_ranking_top_10(div) {
             var cx = parseFloat(e.selectedShape.attr("cx")),
                 cy = parseFloat(e.selectedShape.attr("cy")),
                 r = parseFloat(e.selectedShape.attr("r")),
-                fill = e.selectedShape.attr("fill");
+                fill = e.selectedShape.attr("fill"),
+                opacity = e.selectedShape.attr("opacity");
 
             // Set the size and position of the popup
             var width = 150,
@@ -86,6 +87,61 @@ var diabetes_ccg_ranking_top_10 = function diabetes_ccg_ranking_top_10(div) {
                 .text('Prevalence: ' + Math.round(e.seriesValue[3] * 10) / 10 + '%')
                 .style("font-family", "sans-serif")
                 .style("font-size", 10);
+
+            /* Drop line that goes from the circle to x- and y-axis. Shown on hover. */
+            var dropDest = myChart.series[0]._dropLineOrigin(),
+                animDuration = 750;
+
+            if (myChart._tooltipGroup !== null && myChart._tooltipGroup !== undefined) {
+                myChart._tooltipGroup.remove();
+            }
+            myChart._tooltipGroup = myChart.svg.append("g");
+
+            // Add a ring around the data point
+            myChart._tooltipGroup.append("circle")
+                .attr("id", "ring")
+                .attr("cx", cx)
+                .attr("cy", cy)
+                .attr("r", r)
+                .attr("opacity", 0)
+                .transition()
+                .duration(animDuration / 2)
+                .ease("linear")
+                .attr("opacity", 1)
+                .attr("r", r + 4)
+                .style("stroke-width", 2);
+
+            // Add a drop line to the y axis
+            if (dropDest.x !== null) {
+                myChart._tooltipGroup.append("line")
+                    .attr("id", "drop")
+                    .attr("x1", (cx < dropDest.x ? cx + r + 4 : cx - r - 4))
+                    .attr("y1", cy)
+                    .attr("x2", (cx < dropDest.x ? cx + r + 4 : cx - r - 4))
+                    .attr("y2", cy)
+                    .style("opacity", opacity)
+                    .transition()
+                    .delay(animDuration / 2)
+                    .duration(animDuration / 2)
+                    .ease("linear")
+                    .attr("x2", dropDest.x);
+            }
+
+            // Add a drop line to the y axis
+            if (dropDest.y !== null) {
+                myChart._tooltipGroup.append("line")
+                    .attr("id", "drop")
+                    .attr("x1", cx)
+                    .attr("y1", (cy < dropDest.y ? cy + r + 4 : cy - r - 4))
+                    .attr("x2", cx)
+                    .attr("y2", (cy < dropDest.y ? cy + r + 4 : cy - r - 4))
+                    .style("opacity", opacity)
+                    .transition()
+                    .delay(animDuration / 2)
+                    .duration(animDuration / 2)
+                    .ease("linear")
+                    .attr("y2", dropDest.y);
+            }
         }
 
         // Event to handle mouse exit
@@ -93,6 +149,10 @@ var diabetes_ccg_ranking_top_10 = function diabetes_ccg_ranking_top_10(div) {
             // Remove the popup
             if (popup !== null) {
                 popup.remove();
+            }
+            // Remove the drop line and ring around circle
+            if (myChart._tooltipGroup !== null && myChart._tooltipGroup !== undefined) {
+                myChart._tooltipGroup.remove();
             }
         };
     });
@@ -186,6 +246,61 @@ var diabetes_ccg_ranking_bottom_10 = function diabetes_ccg_ranking_bottom_10(div
                 .text('Prevalence: ' + Math.round(e.seriesValue[3] * 10) / 10 + '%')
                 .style("font-family", "sans-serif")
                 .style("font-size", 10);
+
+            /* Drop line that goes from the circle to x- and y-axis. Shown on hover. */
+            var dropDest = myChart.series[0]._dropLineOrigin(),
+                animDuration = 750;
+
+            if (myChart._tooltipGroup !== null && myChart._tooltipGroup !== undefined) {
+                myChart._tooltipGroup.remove();
+            }
+            myChart._tooltipGroup = myChart.svg.append("g");
+
+            // Add a ring around the data point
+            myChart._tooltipGroup.append("circle")
+                .attr("id", "ring")
+                .attr("cx", cx)
+                .attr("cy", cy)
+                .attr("r", r)
+                .attr("opacity", 0)
+                .transition()
+                .duration(animDuration / 2)
+                .ease("linear")
+                .attr("opacity", 1)
+                .attr("r", r + 4)
+                .style("stroke-width", 2);
+
+            // Add a drop line to the y axis
+            if (dropDest.x !== null) {
+                myChart._tooltipGroup.append("line")
+                    .attr("id", "drop")
+                    .attr("x1", (cx < dropDest.x ? cx + r + 4 : cx - r - 4))
+                    .attr("y1", cy)
+                    .attr("x2", (cx < dropDest.x ? cx + r + 4 : cx - r - 4))
+                    .attr("y2", cy)
+                    .style("opacity", opacity)
+                    .transition()
+                    .delay(animDuration / 2)
+                    .duration(animDuration / 2)
+                    .ease("linear")
+                    .attr("x2", dropDest.x);
+            }
+
+            // Add a drop line to the y axis
+            if (dropDest.y !== null) {
+                myChart._tooltipGroup.append("line")
+                    .attr("id", "drop")
+                    .attr("x1", cx)
+                    .attr("y1", (cy < dropDest.y ? cy + r + 4 : cy - r - 4))
+                    .attr("x2", cx)
+                    .attr("y2", (cy < dropDest.y ? cy + r + 4 : cy - r - 4))
+                    .style("opacity", opacity)
+                    .transition()
+                    .delay(animDuration / 2)
+                    .duration(animDuration / 2)
+                    .ease("linear")
+                    .attr("y2", dropDest.y);
+            }
         }
 
         // Event to handle mouse exit
@@ -193,6 +308,10 @@ var diabetes_ccg_ranking_bottom_10 = function diabetes_ccg_ranking_bottom_10(div
             // Remove the popup
             if (popup !== null) {
                 popup.remove();
+            }
+            // Remove the drop line and ring around circle
+            if (myChart._tooltipGroup !== null && myChart._tooltipGroup !== undefined) {
+                myChart._tooltipGroup.remove();
             }
         };
     });
