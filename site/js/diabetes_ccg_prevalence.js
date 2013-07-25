@@ -111,7 +111,8 @@ var ccg_diabetes_prevalence_map = function ccg_diabetes_prevalence_map(div_map, 
 
             var x = sidechart.addCategoryAxis("x", "Practice Code");
             var y = sidechart.addMeasureAxis("y", "GP Prevalence");
-            
+            y.overrideMax = 10;
+
             sidechart.addSeries(["Practice Name", "Practice Code"], dimple.plot.bar);
             sidechart.draw();
             sidechart.svg.selectAll("g")
