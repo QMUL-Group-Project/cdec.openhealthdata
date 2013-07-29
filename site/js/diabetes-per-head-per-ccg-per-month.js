@@ -4,12 +4,12 @@ var diabetes_per_head_per_ccg_per_month = function diabetes_per_head_per_ccg_per
     var color = function getColor(d) {
         return  d == 'NA' ? '#333' :
             d == 'undefined' ? '#333' :
-            d > 30 ? '#0C2C84' :
-            d > 28 ? '#225EA8' :
-            d > 26 ? '#1D91C0' :
-            d > 24 ? '#41B6C4' :
-            d > 22 ? '#7FCDBB' :
-            d > 20 ? '#C7E9B4' :
+            d > 26 ? '#0C2C84' :
+            d > 24 ? '#225EA8' :
+            d > 22 ? '#1D91C0' :
+            d > 20 ? '#41B6C4' :
+            d > 18 ? '#7FCDBB' :
+            d > 16 ? '#C7E9B4' :
             '#FFFFCC';
     };
     var style = function style(feature) {
@@ -58,7 +58,7 @@ var diabetes_per_head_per_ccg_per_month = function diabetes_per_head_per_ccg_per
 
     mergedFeatureLayer(map, "data/diabetes_per_head_per_ccg_per_month.csv", "data/ccg-boundaries.json", "ccg_code", style, onEachFeature, pointToLayer, "ccg_boundaries");
 
-    addLegend([0, 20, 22, 24, 26, 28, 30, 34], map, color);
+    addLegend([0, 16, 18, 20, 22, 24, 26, 28], map, color);
 
     addInfo(map, function (props) {
         var infoBox = '<h3>Diabetes Spend per CCG</h3><br/>' 
