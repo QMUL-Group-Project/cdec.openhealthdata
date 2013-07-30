@@ -1,6 +1,6 @@
 var spend_month_by_month = function spend_month_by_month(chart_div, ccg_code) {
 
-    var chart_svg = dimple.newSvg(chart_div, 600, 500);
+    var chart_svg = dimple.newSvg(chart_div, 600, 300);
 
     d3.csv("/data/spend_month_by_month2012.csv", function (data) {
 
@@ -11,7 +11,7 @@ var spend_month_by_month = function spend_month_by_month(chart_div, ccg_code) {
         x.addOrderRule(["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]);
         x.lineMarkers = true;
         var y = myChart.addMeasureAxis("y", "per_capita_spend");
-        y.overrideMax = 30;
+        y.overrideMax = 28;
         y.overrideMin = 0;
         var s = myChart.addSeries(["ccg_code", "per_capita_spend"], dimple.plot.bar);
 
