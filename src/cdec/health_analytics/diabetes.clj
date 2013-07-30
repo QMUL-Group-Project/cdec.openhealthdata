@@ -137,7 +137,8 @@
 (defn total-spend-per-month-england [input]
   (<- [?month ?total-spend]
       (input :> ?ccg ?year ?month ?total-net-ingredient-cost)
-      (ops/sum ?total-net-ingredient-cost :> ?total-spend)))
+      (ops/sum ?total-net-ingredient-cost :> ?total-spend-exp)
+      (long ?total-spend-exp :> ?total-spend)))
 
 ;; month,total_spend
 #_ (?- (hfs-delimited "./output/diabetes-total-spend-per-month-england" :delimiter "," :sinkmode :replace)
