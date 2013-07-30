@@ -11,8 +11,8 @@ var spend_comparison = function spend_comparison(chart_div, ccg_code) {
         var x = myChart.addCategoryAxis("x", "month");
         x.addOrderRule(["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]);
         var y = myChart.addMeasureAxis("y", "difference");
-        y.overrideMax = 10;
-        y.overrideMin = -8;
+        y.overrideMax = 6;
+        y.overrideMin = -6;
         var s = myChart.addSeries(["ccg_code", "difference"], dimple.plot.bar);
         // Handle the hover event - overriding the default behaviour
         s.addEventHandler("mouseover", onHover);
