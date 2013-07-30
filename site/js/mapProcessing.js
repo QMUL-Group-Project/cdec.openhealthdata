@@ -194,10 +194,6 @@ function addCategoricalLegend(categories, map, categoricalColor) {
     legend.addTo(map);
 };
 
-function numberWithCommas(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
 /* Function that is used to estimate the width of the custom tooltip */
 function measureText(pText, pFontSize, pStyle) {
     var lDiv = document.createElement('lDiv');

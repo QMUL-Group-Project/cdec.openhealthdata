@@ -5,7 +5,7 @@ var spend_month_by_month = function spend_month_by_month(chart_div, ccg_code) {
 
     d3.csv("/data/spend_month_by_month2012.csv", function (data) {
 
-        data = dimple.filterData(data, "ccg_code", [ccg_code])
+        data = dimple.filterData(data, "ccg_code", [ccg_code]);
         myChart = new dimple.chart(chart_svg, data);
         myChart.setBounds(60, 30, 350, 250);
 

@@ -8,7 +8,7 @@ var diabetes_gp_ranking_top_10 = function diabetes_gp_ranking_top_10(div) {
 
         var myChart = new dimple.chart(svg, data);
 
-        myChart.setBounds(60, 30, 600, 300)
+        myChart.setBounds(60, 30, 600, 300);
         var x = myChart.addCategoryAxis("x", "Practice Code");
         x.addOrderRule("Prevalence", false); // (ordering measure, descending?)
         myChart.addMeasureAxis("y", "Prevalence");

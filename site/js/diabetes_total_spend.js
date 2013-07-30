@@ -6,7 +6,7 @@ var total_spend = function total_spend(chart_div) {
     d3.csv("/data/diabetes_total_spend2013.csv", function (data) {
 
         myChart = new dimple.chart(chart_svg, data);
-        myChart.setBounds(60, 30, 350, 250)
+        myChart.setBounds(60, 30, 350, 250);
         var x = myChart.addCategoryAxis("x", "month");
         x.addOrderRule(["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]);
         x.lineMarkers = true;

@@ -1,12 +1,9 @@
+/* Drop line that goes from the bar to x- and y-axis. Shown on hover. */
 function addDropLineRect(myChart, e, rx, ry, h) {
 
-    var dropLine;
-
-    /* Drop line that goes from the circle to x- and y-axis. Shown on hover. */
+    var dropLine = myChart._tooltipGroup = myChart.svg.append("g");
     var dropDest = myChart.series[0]._dropLineOrigin(),
         animDuration = 750;
-
-    dropLine = myChart._tooltipGroup = myChart.svg.append("g");
 
     // Add a drop line to the y axis
     if (dropDest.y !== null) {
@@ -38,18 +35,15 @@ function addDropLineRect(myChart, e, rx, ry, h) {
         .style("stroke-width", 2);
 
     return dropLine;
-
 }
 
+/* Drop line that goes from the circle to x- and y-axis. Shown on hover. */
 function addDropLineCircle(myChart, cx, cy, r) {
 
-    var dropLine;
+    var dropLine = myChart._tooltipGroup = myChart.svg.append("g");
 
-    /* Drop line that goes from the circle to x- and y-axis. Shown on hover. */
     var dropDest = myChart.series[0]._dropLineOrigin(),
         animDuration = 750;
-
-    dropLine = myChart._tooltipGroup = myChart.svg.append("g");
 
     // Add a ring around the data point
     dropLine.append("circle")
@@ -65,7 +59,7 @@ function addDropLineCircle(myChart, cx, cy, r) {
         .attr("r", r + 4)
         .style("stroke-width", 2);
 
-    // Add a drop line to the y axis
+    // Add a drop line to the x axis
     if (dropDest.x !== null) {
         dropLine.append("line")
             .attr("id", "drop")
@@ -94,14 +88,11 @@ function addDropLineCircle(myChart, cx, cy, r) {
             .ease("linear")
             .attr("y2", dropDest.y);
     }
-
     return dropLine;
-
 }
 
 function addPopup(chart_svg, width, height, x, y, labels, values, popupWidth) {
 
-    // Create a group for the popup objects
     var popup = chart_svg.append("g");
 
     // Add a rectangle surrounding the text
@@ -115,7 +106,7 @@ function addPopup(chart_svg, width, height, x, y, labels, values, popupWidth) {
         .attr("rx", 5)
         .attr("ry", 5);
 
-    var offset = 9;
+    var offset = 9; // Each line of text needs to be moved down
     for (var i = 0; i < labels.length; i++) {
         popup
             .append('text')
@@ -124,9 +115,8 @@ function addPopup(chart_svg, width, height, x, y, labels, values, popupWidth) {
             .attr('y', y + offset)
             .text('' + labels[i] + ': ' + values[i])
             .style("font-family", "sans-serif")
-            .style("font-size", 10)
+            .style("font-size", 10);
         offset += 12;
     }
-
     return popup;
 }
