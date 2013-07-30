@@ -36,16 +36,12 @@ var spend_comparison = function spend_comparison(chart_div, ccg_code) {
             // Get the properties of the selected shape
             var x = parseFloat(e.selectedShape.attr("x")),
                 y = parseFloat(e.selectedShape.attr("y")),
-                fill = e.selectedShape.attr("fill"),
-                opacity = e.selectedShape.attr("opacity"),
-                h = parseFloat(e.selectedShape.attr("height")),
-                w = parseFloat(e.selectedShape.attr("width"));
-
+                h = parseFloat(e.selectedShape.attr("height"));
             // Set the size and position of the popup
             var width = 100,
                 height = 40;
 
-            dropLine = addDropLineRect(myChart, e, x, y, h+1, fill, opacity);
+            dropLine = addDropLineRect(myChart, e, x, y, h+1);
             popupValues = new Array(e.seriesValue[0], ('£'+numeral(e.seriesValue[1]).format('0,0.00')));
             var textLength = measureText(e.seriesValue[1], 10, "font-family: sans-serif");
             popupWidth = textLength.width + 30;

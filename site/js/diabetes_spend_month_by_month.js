@@ -46,7 +46,7 @@ var spend_month_by_month = function spend_month_by_month(chart_div, ccg_code) {
             var width = 100,
                 height = 40;
 
-            dropLine = addDropLineRect(myChart, e, x, y, fill, opacity);
+            dropLine = addDropLineRect(myChart, e, x, y, opacity);
             popupValues = new Array(e.seriesValue[0], ('£'+numeral(e.seriesValue[1]).format('0,0.00')));
             var textLength = measureText(e.seriesValue[1], 10, "font-family: sans-serif");
             popupWidth = textLength.width + 30;

@@ -1,4 +1,4 @@
-function addDropLineRect(myChart, e, rx, ry, h, fill, opacity) {
+function addDropLineRect(myChart, e, rx, ry, h) {
 
     var dropLine;
 
@@ -6,9 +6,6 @@ function addDropLineRect(myChart, e, rx, ry, h, fill, opacity) {
     var dropDest = myChart.series[0]._dropLineOrigin(),
         animDuration = 750;
 
-    if (myChart._tooltipGroup !== null && myChart._tooltipGroup !== undefined) {
-        myChart._tooltipGroup.remove();
-    }
     dropLine = myChart._tooltipGroup = myChart.svg.append("g");
 
     // Add a drop line to the y axis
@@ -19,7 +16,6 @@ function addDropLineRect(myChart, e, rx, ry, h, fill, opacity) {
             .attr("y1", (ry < myChart.series[0].y._origin ? ry : ry + h - 1))
             .attr("x2", (rx < dropDest.x ? rx : rx))
             .attr("y2", (ry < myChart.series[0].y._origin ? ry : ry + h - 1))
-            .style("opacity", opacity)
             .transition()
             .delay(animDuration / 2)
             .duration(animDuration / 2)
@@ -45,7 +41,7 @@ function addDropLineRect(myChart, e, rx, ry, h, fill, opacity) {
 
 }
 
-function addDropLineCircle(myChart, cx, cy, r, fill, opacity){
+function addDropLineCircle(myChart, cx, cy, r) {
 
     var dropLine;
 
@@ -77,7 +73,6 @@ function addDropLineCircle(myChart, cx, cy, r, fill, opacity){
             .attr("y1", cy)
             .attr("x2", (cx < dropDest.x ? cx + r + 4 : cx - r - 4))
             .attr("y2", cy)
-            .style("opacity", opacity)
             .transition()
             .delay(animDuration / 2)
             .duration(animDuration / 2)
@@ -93,7 +88,6 @@ function addDropLineCircle(myChart, cx, cy, r, fill, opacity){
             .attr("y1", (cy < dropDest.y ? cy + r + 4 : cy - r - 4))
             .attr("x2", cx)
             .attr("y2", (cy < dropDest.y ? cy + r + 4 : cy - r - 4))
-            .style("opacity", opacity)
             .transition()
             .delay(animDuration / 2)
             .duration(animDuration / 2)
@@ -105,7 +99,7 @@ function addDropLineCircle(myChart, cx, cy, r, fill, opacity){
 
 }
 
-function addPopup(chart_svg, width, height, x, y, labels, values, popupWidth){
+function addPopup(chart_svg, width, height, x, y, labels, values, popupWidth) {
 
     // Create a group for the popup objects
     var popup = chart_svg.append("g");
@@ -114,15 +108,15 @@ function addPopup(chart_svg, width, height, x, y, labels, values, popupWidth){
     popup
         .append("rect")
         .attr("id", "tooltip")
-        .attr("x", x+50)
-        .attr("y", y-10)
+        .attr("x", x + 50)
+        .attr("y", y - 10)
         .attr("width", popupWidth)
         .attr("height", height)
         .attr("rx", 5)
         .attr("ry", 5);
 
     var offset = 9;
-    for(var i=0; i<labels.length; i++){
+    for (var i = 0; i < labels.length; i++) {
         popup
             .append('text')
             .append('tspan')

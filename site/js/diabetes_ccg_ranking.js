@@ -29,10 +29,7 @@ var diabetes_ccg_ranking_top_10 = function diabetes_ccg_ranking_top_10(div) {
             // Get the properties of the selected shape
             var cx = parseFloat(e.selectedShape.attr("cx")),
                 cy = parseFloat(e.selectedShape.attr("cy")),
-                r = parseFloat(e.selectedShape.attr("r")),
-                fill = e.selectedShape.attr("fill"),
-                opacity = e.selectedShape.attr("opacity");
-
+                r = parseFloat(e.selectedShape.attr("r"));
             // Set the size and position of the popup
             var width = 150,
                 height = 70,
@@ -43,7 +40,7 @@ var diabetes_ccg_ranking_top_10 = function diabetes_ccg_ranking_top_10(div) {
                 15 :
                 cy - height / 2);
 
-            dropLine = addDropLineCircle(myChart, cx, cy, r, fill, opacity);
+            dropLine = addDropLineCircle(myChart, cx, cy, r);
             popupValues = new Array(e.seriesValue[0], e.seriesValue[1], numeral(e.seriesValue[2]).format('0,0'), (numeral(e.seriesValue[3]).format('0,0.0')+'%'));
             var textLength = measureText(e.seriesValue[1], 10, "font-family: sans-serif");
             popupWidth = textLength.width + 75;
@@ -96,10 +93,7 @@ var diabetes_ccg_ranking_bottom_10 = function diabetes_ccg_ranking_bottom_10(div
             // Get the properties of the selected shape
             var cx = parseFloat(e.selectedShape.attr("cx")),
                 cy = parseFloat(e.selectedShape.attr("cy")),
-                r = parseFloat(e.selectedShape.attr("r")),
-                fill = e.selectedShape.attr("fill"),
-                opacity = e.selectedShape.attr("opacity");
-
+                r = parseFloat(e.selectedShape.attr("r"));
             // Set the size and position of the popup
             var width = 150,
                 height = 70,
@@ -110,7 +104,7 @@ var diabetes_ccg_ranking_bottom_10 = function diabetes_ccg_ranking_bottom_10(div
                     15 :
                     cy - height / 2);
 
-            dropLine = addDropLineCircle(myChart, cx, cy, r, fill, opacity);
+            dropLine = addDropLineCircle(myChart, cx, cy, r);
             popupValues = new Array(e.seriesValue[0], e.seriesValue[1], numeral(e.seriesValue[2]).format('0,0'), (numeral(e.seriesValue[3]).format('0,0.0')+'%'));
             var textLength = measureText(e.seriesValue[1], 10, "font-family: sans-serif");
             popupWidth = textLength.width + 75;
