@@ -9,7 +9,8 @@
             [cdec.health-analytics.gp-total-registered :as gpt]
             [clojure.tools.logging :refer [infof errorf]]
             [clojure.math.numeric-tower :as math]
-            [cdec.health-analytics.gp-outcomes :as gpo]))
+            [cdec.health-analytics.gp-outcomes :as gpo]
+            [cdec.health-analytics.organisational-data :as ods]))
 
 (defn calc-no-patients [percentile total-gp-patients]
   (-> (* total-gp-patients percentile)
@@ -25,10 +26,8 @@
   (-> (s/replace txt #"%" "")
       (s/replace #"," "")))
 
-(defn gp-ccg-mapping [input]
+(defn gp-ccg-mapping [epraccur]
   (<- [?gp-code ?ccg-code ?ccg-name]
-      (input ?line)
-      (tl/data-line? ?line)
       (tl/split-line ?line :#> 5 {0 ?gp-code 2 ?ccg-code 3 ?ccg-name})))
 
 (defn diabetes-prevalence-gp [input]
@@ -62,14 +61,14 @@
       (input :> ?gp-code ?gp-name ?registered-patients ?diabetes-patients ?prevalence)
       (ops/avg ?prevalence :> ?mean-prevalence)))
 
-(defn diabetes-prevalence-ccg [ccg-gp-list gp-prevalence]
+(defn diabetes-prevalence-ccg [epraccur gp-prevalence ccglist]
   (<- [?ccg-code ?ccg-name ?ccg-registered-patients ?ccg-diabetes-patients ?ccg-prevalence]
-      (gp-prevalence :> ?gp-code ?gp-name ?gp-registered-patients ?gp-diabetes-patients _)
 
-      (ccg-gp-list ?ccg-line)
-      (tl/data-line? ?ccg-line)
-      (tl/split-line ?ccg-line :#> 5 {0 ?gp-code 2 ?ccg-code 3 ?ccg-name-dirty})
-      (scrub-data ?ccg-name-dirty :> ?ccg-name)
+      (gp-prevalence :> ?gp-code ?gp-name ?gp-registered-patients ?gp-diabetes-patients ?gp-prevalence)
+
+      (epraccur :#> 20 {0 ?gp-code 14 ?ccg-code})
+
+      (ccglist :> _ _ ?ccg-code ?ccg-name)
 
       (ops/sum ?gp-registered-patients :> ?ccg-registered-patients)
       (ops/sum ?gp-diabetes-patients :> ?ccg-diabetes-patients)
@@ -92,7 +91,7 @@
       (input :> ?gp-code ?gp-name ?gp-registered ?gp-prevalence ?gp-percentage)
       (:sort ?gp-percentage)
       (:reverse order)
-      (ops/limit [n] ?gp-code ?gp-name ?gp-registered ?gp-percentage :> ?gp-code-out ?gp-name-out ?gp-percentage-out)))
+      (ops/limit [n] ?gp-code ?gp-name ?gp-registered ?gp-percentage :> ?gp-code-out ?gp-name-out ?gp-registered-out ?gp-percentage-out)))
 
 (defn top-n-per-ccg [input n order]
   (<- [?ccg-code-out ?gp-code-out ?gp-name-out ?gp-prevalence-out ?r]
@@ -108,10 +107,10 @@
       (:reverse order)
       (ops/limit [n] ?ccg-code ?ccg-name ?ccg-registered-patients ?ccg-prevalence :> ?ccg-code-out ?ccg-name-out ?ccg-registered-patients-out ?ccg-prevalence-out)))
 
-(defn join-gp-with-ccg [gp-prevalence gp-ccg-mapping]
-  (<- [?gp-code ?gp-name !!ccg-code ?gp-registered-patients ?gp-diabetes-patients ?gp-prevalence]
+(defn join-gp-with-ccg [gp-prevalence epraccur]
+  (<- [?gp-code ?gp-name ?ccg-code ?gp-registered-patients ?gp-diabetes-patients ?gp-prevalence]
       (gp-prevalence :> ?gp-code ?gp-name ?gp-registered-patients ?gp-diabetes-patients ?gp-prevalence)
-      (gp-ccg-mapping :> ?gp-code !!ccg-code !!ccg-name)))
+      (epraccur :#> 20 {0 ?gp-code 14 ?ccg-code})))
 
 
 ;; Prevalence per GP
@@ -121,13 +120,16 @@
         (diabetes-prevalence-gp (hfs-textline data-in))))
 
 ;; Prevalence per CCG
+;; CCG list file: http://www.england.nhs.uk/resources/ccg-directory/
 #_(let [data-in1 "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"
-        data-in2 "./input/list-of-proposed-practices-ccg.csv"
+        data-in2 "./input/ods/gppractice/epraccur.csv"
+        data-in3 "./input/ods/ccglist/ccg-lsoa.csv"
         data-out "./output/ccg_prevalence/"]
     (?- (hfs-delimited data-out :sinkmode :replace :delimiter ",")
         (diabetes-prevalence-ccg
-         (hfs-textline data-in2)
-         (diabetes-prevalence-gp (hfs-textline data-in1)))))
+         (ods/current-practices (hfs-delimited data-in2 :delimiter ","))
+         (diabetes-prevalence-gp (hfs-textline data-in1))
+         (hfs-delimited data-in3 :delimiter ","))))
 
 ;; Total number of diabetes patients in England and prevalence
 #_ (let [data-in "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"]
@@ -143,63 +145,71 @@
 
 ;; Average diabetes prevalence per CCG
 #_ (let [data-in1 "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"
-         data-in2 "./input/list-of-proposed-practices-ccg.csv"]
+         data-in2 "./input/ods/gppractice/epraccur.csv"
+         data-in3 "./input/ods/ccglist/ccg-lsoa.csv"]
      (?- (stdout)
          (mean-prevalence-ccg
           (diabetes-prevalence-ccg
-           (hfs-textline data-in2)
-           (diabetes-prevalence-gp (hfs-textline data-in1))))))
+           (ods/current-practices (hfs-delimited data-in2 :delimiter ","))
+           (diabetes-prevalence-gp (hfs-textline data-in1))
+           (hfs-delimited data-in3 :delimiter ",")))))
 
 ;; Left outer join of gp and ccg data
 #_ (let [data-in1 "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"
-         data-in2 "./input/list-of-proposed-practices-ccg.csv"
+         data-in2"./input/ods/gppractice/epraccur.csv"
          data-out "./output/gp-joined-with-ccg/"]
      (?- (hfs-delimited data-out :sinkmode :replace :delimiter ",")
          (join-gp-with-ccg
           (diabetes-prevalence-gp (hfs-textline data-in1))
-          (gp-ccg-mapping (hfs-textline data-in2)))))
+          (ods/current-practices (hfs-delimited data-in2 :delimiter ",")))))
 
 ;; Percentage of patients in each GP that constitutes patients in CCG
 #_ (let [data-in1 "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"
-         data-in2 "./input/list-of-proposed-practices-ccg.csv"
-         data-out "./output/gp-ccg-prevalence/"]
+         data-in2 "./input/ods/gppractice/epraccur.csv"
+         data-out "./output/gp-ccg-prevalence/"
+         data-in3 "./input/ods/ccglist/ccg-lsoa.csv"]
      (?- (hfs-delimited data-out :sinkmode :replace :delimiter ",")
          (gp-percentage-within-ccg
           (join-gp-with-ccg
            (diabetes-prevalence-gp (hfs-textline data-in1))
-           (gp-ccg-mapping (hfs-textline data-in2)))
+           (ods/current-practices (hfs-delimited data-in2 :delimiter ",")))
           (diabetes-prevalence-ccg
-           (hfs-textline data-in2)
-           (diabetes-prevalence-gp (hfs-textline data-in1))))))
+           (ods/current-practices (hfs-delimited data-in2 :delimiter ","))
+           (diabetes-prevalence-gp (hfs-textline data-in1))
+           (hfs-delimited data-in3 :delimiter ",")))))
 
 ;; Number n of high and low GP surgeries per CCG
 #_(let [data-in1 "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"
-        data-in2 "./input/list-of-proposed-practices-ccg.csv"
+        data-in2 "./input/ods/gppractice/epraccur.csv"
+        data-in3 "./input/ods/ccglist/ccg-lsoa.csv"
         data-out "./output/low-surgeries-per-ccg/"]
     (?- (hfs-delimited data-out :sinkmode :replace :delimiter ",")
         (top-n-per-ccg
          (gp-percentage-within-ccg
           (join-gp-with-ccg
            (diabetes-prevalence-gp (hfs-textline data-in1))
-           (gp-ccg-mapping (hfs-textline data-in2)))
+           (ods/current-practices (hfs-delimited data-in2 :delimiter ",")))
           (diabetes-prevalence-ccg
-           (hfs-textline data-in2)
-           (diabetes-prevalence-gp (hfs-textline data-in1))))
+           (ods/current-practices (hfs-delimited data-in2 :delimiter ","))
+           (diabetes-prevalence-gp (hfs-textline data-in1))
+           (hfs-delimited data-in3 :delimiter ",")))
          10 false)))
 
 ;; Number n of high and low GP surgeries per CCG
 #_(let [data-in1 "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"
-        data-in2 "./input/list-of-proposed-practices-ccg.csv"
+        data-in2 "./input/ods/gppractice/epraccur.csv"
+        data-in3 "./input/ods/ccglist/ccg-lsoa.csv"
         data-out "./output/high-surgeries-per-ccg/"]
     (?- (hfs-delimited data-out :sinkmode :replace :delimiter ",")
         (top-n-per-ccg
-         (gp-percentage-within-ccg
+          (gp-percentage-within-ccg
           (join-gp-with-ccg
            (diabetes-prevalence-gp (hfs-textline data-in1))
-           (gp-ccg-mapping (hfs-textline data-in2)))
+           (ods/current-practices (hfs-delimited data-in2 :delimiter ",")))
           (diabetes-prevalence-ccg
-           (hfs-textline data-in2)
-           (diabetes-prevalence-gp (hfs-textline data-in1))))
+           (ods/current-practices (hfs-delimited data-in2 :delimiter ","))
+           (diabetes-prevalence-gp (hfs-textline data-in1))
+           (hfs-delimited data-in3 :delimiter ",")))
          10 true)))
 
 ;; Top 10 GP surgeries in all England
@@ -219,10 +229,13 @@
           10 true)))
 
 #_ (let [data-in1 "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"
-         data-in2 "./input/list-of-proposed-practices-ccg.csv"
+         data-in2 "./input/ods/gppractice/epraccur.csv"
+         data-in3 "./input/ods/ccglist/ccg-lsoa.csv"
          data-out "./output/top-10-ccg/"]
      (?- (hfs-delimited data-out :sinkmode :replace :delimiter ",")
          (top-n-ccg
-          (diabetes-prevalence-ccg
-           (hfs-textline data-in2)
-           (diabetes-prevalence-gp (hfs-textline data-in1))) 10 false)))
+         (diabetes-prevalence-ccg
+           (ods/current-practices (hfs-delimited data-in2 :delimiter ","))
+           (diabetes-prevalence-gp (hfs-textline data-in1))
+           (hfs-delimited data-in3 :delimiter ","))
+         10 false)))

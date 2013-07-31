@@ -10,6 +10,9 @@
 #_(use 'cascalog.playground)
 #_(bootstrap-emacs)
 
+(defn active? [status-code]
+    (not= status-code "C" ))
+
 ;; http://systems.hscic.gov.uk/data/ods/supportinginfo/filedescriptions#_Toc350757591
 (defn current-practices [epraccur]
   (<- [?organisation-code ?name !national-grouping !high-level-health-authority
@@ -21,7 +24,8 @@
                         4 !address-1 5 !address-2 6 !address-3 7 !address-4 8 !address-5 9 !postcode
                         10 ?open-date 11 !close-date 12 ?status-code 13 ?org-sub-type-code
                         14 !parent-org-code 15 !join-parent-date 16 !left-parent-date
-                        17 !contact-telephone 21 ?amend-record-indicator 25 ?practice-type})))
+                        17 !contact-telephone 21 ?amend-record-indicator 25 ?practice-type})
+      (active? ?status-code)))
 
 #_(?- (hfs-delimited "./output/epraccur" :delimiter "," :sinkmode :replace)
       (current-practices (hfs-delimited "./input/ods/gppractice/epraccur.csv" :delimiter ",")))

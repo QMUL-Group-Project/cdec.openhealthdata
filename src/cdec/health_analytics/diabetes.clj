@@ -32,24 +32,17 @@
                           "0601023Y0"
                           ;; Acarbose
                           "0601023A0"
+                          ;; Glucose Blood Testing Reagents
+                          "0601060D0"
                           ])
       (pred/in? bnf-name [;; kit
-                          "Lancets" ".*Glucose \\(Reagent\\)_ Strip.*"])))
-
-(defn split-bnf-code [bnf-code]
-  (> (count bnf-code) 8)
-  (subs bnf-code 0 9))
-
-(defn active? [status-code]
-    (not= status-code "C" ))
+                          "Lancets"])))
 
 (defn diabetes-drugs [scrips epraccur]
   (<- [?ccg ?practice ?bnf-code ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?year ?month]
-      (scrips :> ?sha ?pct ?practice ?bnf-code-string ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?year ?month)
-      (split-bnf-code ?bnf-code-string :> ?bnf-code)
-      (diabetes-drug? ?bnf-code ?bnf-name)
-      (epraccur :#> 20 {0 ?practice 12 ?status-code 14 ?ccg})
-      (active? ?status-code)))
+      (scrips :> ?sha ?pct ?practice ?bnf-code ?bnf-chemical ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?year ?month)
+      (diabetes-drug? ?bnf-chemical ?bnf-name)
+      (epraccur :#> 20 {0 ?practice 12 ?status-code 14 ?ccg})))
 
 #_(?- (hfs-delimited "./output/diabetes-drugs" :delimiter "," :sinkmode :replace)
       (diabetes-drugs
