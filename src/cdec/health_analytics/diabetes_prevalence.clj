@@ -26,10 +26,6 @@
   (-> (s/replace txt #"%" "")
       (s/replace #"," "")))
 
-(defn gp-ccg-mapping [epraccur]
-  (<- [?gp-code ?ccg-code ?ccg-name]
-      (tl/split-line ?line :#> 5 {0 ?gp-code 2 ?ccg-code 3 ?ccg-name})))
-
 (defn diabetes-prevalence-gp [input]
   (<- [?gp-code ?gp-name ?registered-patients ?diabetes-patients ?prevalence]
       (input ?line)
