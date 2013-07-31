@@ -65,8 +65,8 @@ var diabetes_prevalence_map = function diabetes_prevalence_map(div) {
             'Practice name: ' + props.practice_name + '<br />' +
             'Practice code: ' + props.practice_code + '<br />' +
             'Prevalence: ' + props.gp_prevalence + '%<br />' +
-            'Patients registered: ' + numberWithCommas(Math.round(props.gp_registered_patients)) + '<br />' +
-            'Diabetes patients: ' + numberWithCommas(Math.round(props.gp_diabetes_patients)) +'<br />' +
+            'Patients registered: ' + numeral(props.gp_registered_patients).format('0,0.0') + '<br />' +
+            'Diabetes patients: ' + numeral(props.gp_diabetes_patients).format('0,0.0') +'<br />' +
             'CCG Code: ' + props.ccg_code + '<br />' +
             'CCG Prevalence: '+ Math.round(props.ccg_prevalence * 10) / 10  + '%<br />' +
             'Diabetes patients in this practice constitute ' + Math.round(props.gp_ccg_ratio * 10) / 10 +'% of diabetes patients in ' + props.ccg_code + ' CCG.';

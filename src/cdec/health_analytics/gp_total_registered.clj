@@ -13,7 +13,6 @@
   (s/replace num #"," ""))
 
 (defn gp-patients [input]
-  (infof "Passing line to gp-patients-2: %s" input)
   (<- [?gp-code ?total]      (input ?line)
       (tl/data-line? ?line)
       (tl/split-line ?line :#> 36 {4 ?gp-code 6 ?total-dirty})

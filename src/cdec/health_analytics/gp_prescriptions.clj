@@ -13,9 +13,15 @@
 (defn year-month [period]
   [(.substring period 0 4) (.substring period 4 6)])
 
+(defn split-bnf-code [bnf-code]
+  (if (> (count bnf-code) 8)
+                     (subs bnf-code 0 9)
+                   bnf-code))
+
 (defn gp-prescriptions [in]
-  (<- [?sha ?pct ?practice ?bnf-code ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?year ?month]
+  (<- [?sha ?pct ?practice ?bnf-code ?bnf-chemical ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?year ?month]
       (in :> ?sha ?pct ?practice ?bnf-code ?bnf-name ?items-string ?net-ingredient-cost-string ?act-cost-string ?quantity-string ?period _)
+      (split-bnf-code ?bnf-code :> ?bnf-chemical)
       (conv/numbers-as-strings? ?items-string ?net-ingredient-cost-string ?act-cost-string ?quantity-string)
       (conv/parse-double ?items-string :> ?items)
       (conv/parse-double ?net-ingredient-cost-string :> ?net-ingredient-cost)

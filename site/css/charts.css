@@ -94,6 +94,12 @@ rect#tooltip {
     fill: white;
 }
 
+rect#frame {
+    stroke: grey;
+    fill: none;
+    stroke-width: 1;
+}
+
 circle {
   stroke: #41B6C4;
   fill: #41B6C4;
@@ -110,6 +116,27 @@ line#drop {
     stroke: #41B6C4;
     stroke-width: 2;
     stroke-dasharray: 3, 3;
+}
+
+line#dropRect {
+    fill: none;
+    stroke: grey;
+    stroke-width: 2;
+    stroke-dasharray: 3, 3;
+}
+
+line#tick {
+    stroke: black;
+    stroke-width: 1;
+}
+
+line#axis {
+    stroke: black;
+    stroke-width: 1;
+}
+
+.rule line {
+    stroke: #eee;
 }
 
 div#tooltip {
