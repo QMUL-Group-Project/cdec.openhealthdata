@@ -11,7 +11,7 @@ var total_spend = function total_spend(chart_div) {
         x.addOrderRule(["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]);
         x.lineMarkers = true;
         var y = myChart.addMeasureAxis("y", "total_spend");
-        y.overrideMax = 50000000;
+        y.overrideMax = 6.1380000609999835E7;
         y.overrideMin = 0;
         var s = myChart.addSeries(["month", "total_spend"], dimple.plot.bar);
 

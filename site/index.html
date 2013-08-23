@@ -26,6 +26,21 @@
             height: 600px;
             margin: 0px 20px;
       }
+    #spendchart {
+        width: 600px;
+        height: 320px;
+        margin: 0px 20px;
+    }
+    #spendcomparison {
+        width: 600px;
+        height: 320px;
+        margin: 0px 20px;
+    }
+    #totalspend {
+        width: 600px;
+        height: 300px;
+        margin: 0px 20px;
+    }
   </style>
 </head>
 
@@ -93,7 +108,20 @@
             <div id="spendmap"></div>
           </div>
 	</div>
-        
+          <div class="span12">
+              <h2>Difference in spending month by month</h2>
+              <p>Click on a CCG area on a map above to see the time series.</p>
+          </div>
+          <div class="span6">
+              <div id="spendchart"></div>
+          </div>
+          <div class="span6">
+              <div id="spendcomparison"></div>
+          </div>
+          <div class="span12"><h2>Total spend across England</h2></div>
+          <div class="span12">
+              <div id="totalspend"></div>
+          </div>
         <div class="span12"> <h2>Diabetes Prevalence</h2> </div>
         <div class="span12">
           <div class="span7"><div id="prevalencemap"></div></div>
@@ -151,18 +179,27 @@
      
   <!-- sugar -->
   <script src="js/mapProcessing.js"></script>
+  <script src="js/chart_sugar.js"></script>
   <link href="css/charts.css" rel="stylesheet" type="text/css">
   <link href="css/legend.css" rel="stylesheet" type="text/css">
   <!-- spend per ccg map -->
   <script src="js/diabetes-per-head-per-ccg-per-month.js"></script>
+  <!-- CCG Spend per capita per month -->
+  <script src="js/diabetes_spend_month_by_month.js"></script>
+  <!-- CCG Spend comparison with previous year -->
+  <script src="js/diabetes_spend_comparison.js"></script>
   <!-- top and bottom 10 -->
   <script src="js/diabetes_ccg_ranking.js"></script>
+  <!-- Total spend across England -->
+  <script src="js/diabetes_total_spend.js"></script>
   <!-- CCG Prevalence Map -->
   <script src="js/diabetes_ccg_prevalence.js"></script>
   <!-- put it all on a page -->
   <script type="text/javascript">
-    diabetes_per_head_per_ccg_per_month('spendmap');
+    diabetes_per_head_per_ccg_per_month('spendmap', '#spendchart', '#spendcomparison');
     ccg_diabetes_prevalence_map('prevalencemap', '#gp_prevalence');
+    total_spend("#totalspend");
+
     //diabetes_ccg_ranking_top_10('#lowest');
     //diabetes_ccg_ranking_bottom_10('#highest');
   </script>
