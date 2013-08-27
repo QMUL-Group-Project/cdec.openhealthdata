@@ -71,6 +71,11 @@ var diabetes_per_head_per_ccg_per_month = function diabetes_per_head_per_ccg_per
         return infoBox;
     });
 
+    // Default charts
+    chart_month_by_month = spend_month_by_month(chart_div, "10Y");
+    chart_spend_comparison = spend_comparison(chart_div2, "10Y");
+
+
     function highlightFeature(e) {
         var layer = e.target;
 
@@ -95,5 +100,14 @@ var diabetes_per_head_per_ccg_per_month = function diabetes_per_head_per_ccg_per
 
     function zoomToFeature(e) {
         map.fitBounds(e.target.getBounds());
+
+        if (chart_month_by_month) { chart_month_by_month.remove() };
+
+        var ccg_code = e.target.feature.properties.ccg_code;
+        // Create a time series chart of spend month by month
+        chart_month_by_month = spend_month_by_month(chart_div, ccg_code);
+
+        if (chart_spend_comparison) { chart_spend_comparison.remove() };
+        chart_spend_comparison = spend_comparison(chart_div2, ccg_code);
     }
 }
