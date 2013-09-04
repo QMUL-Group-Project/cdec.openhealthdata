@@ -1,8 +1,4 @@
-(ns cdec.health-analytics.diabetes
-  (:require [cascalog.api :refer :all]
-            [cascalog.ops :as ops]
-            [clojure.tools.logging :refer [infof errorf]]
-            [cascalog.more-taps :refer [hfs-delimited]]
+(ns cdec.health-analytics.diabetes (:require [cascalog.api :refer :all] [cascalog.ops :as ops] [clojure.tools.logging :refer [infof errorf]] [cascalog.more-taps :refer [hfs-delimited]]
             [cdec.predicates :as pred]
             [clj-time.format :as tf]
             [clj-time.core :as t]
@@ -67,6 +63,15 @@
       (epraccur :#> 20 {0 ?practice 12 ?status-code 14 ?ccg})
       (counts :> ?practice ?gp-patient-count)))
 
+(defn adhd-scrips-per-head-per-ccg-per-month [scrips epraccur counts]
+  (<- [?ccg ?ccg-average ?year ?month]
+      (scrips :> ?sha ?pct ?practice ?bnf-code ?bnf-chemical ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?year ?month)
+      (ops/sum ?quantity :> ?ccg-quantity)
+      (ops/sum ?gp-patient-count :> ?ccg-patient-count)
+      (/ ?ccg-patient-count ?ccg-quantity :> ?ccg-average)
+      (epraccur :#> 20 {0 ?practice 12 ?status-code 14 ?ccg})
+      (counts :> ?practice ?gp-patient-count)))
+
 (defn filtered-prescriptions [in]
   (<- [?sha ?pct ?practice ?bnf-code ?bnf-chemical ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?year ?month]
       (in :> ?sha ?pct ?practice ?bnf-code ?bnf-chemical ?bnf-name ?items-string ?net-ingredient-cost-string ?act-cost-string ?quantity-string ?year ?month)
@@ -117,6 +122,14 @@
 ;; Reading from the filtered list, spend per head per CCG for ADHD
 #_(?- (hfs-delimited "./output/spend-per-head-on-adhd-per-ccg" :delimiter "," :sinkmode :replace)
       (adhd-spend-per-head-per-ccg-per-month
+        (filtered-prescriptions
+          (hfs-delimited "./input/prescriptions/adhd" :delimiter ","))
+        (ods/current-practices (hfs-delimited "./input/ods/gppractice/epraccur.csv" :delimiter ","))
+        (practice-patient-counts (hfs-textline "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv" :delimiter ","))))
+
+;; Reading from the filtered list, scrips per head per CCG for ADHD
+#_(?- (hfs-delimited "./output/scrips-per-head-on-adhd-per-ccg" :delimiter "," :sinkmode :replace)
+      (adhd-scrips-per-head-per-ccg-per-month
         (filtered-prescriptions
           (hfs-delimited "./input/prescriptions/adhd" :delimiter ","))
         (ods/current-practices (hfs-delimited "./input/ods/gppractice/epraccur.csv" :delimiter ","))
