@@ -49,6 +49,12 @@
       (scrips :> ?sha ?pct ?practice ?bnf-code ?bnf-chemical ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?year ?month)
       (ops/sum ?net-ingredient-cost :> ?total-net-ingredient-cost)))
 
+(defn total-cost-of-adhd-per-month-per-ccg [scrips epraccur]
+  (<- [?ccg ?total-net-ingredient-cost ?year ?month]
+      (scrips :> ?sha ?pct ?practice ?bnf-code ?bnf-chemical ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?year ?month)
+      (ops/sum ?net-ingredient-cost :> ?total-net-ingredient-cost)
+      (epraccur :#> 20 {0 ?practice 12 ?status-code 14 ?ccg})))
+
 (defn filtered-prescriptions [in]
   (<- [?sha ?pct ?practice ?bnf-code ?bnf-chemical ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?year ?month]
       (in :> ?sha ?pct ?practice ?bnf-code ?bnf-chemical ?bnf-name ?items-string ?net-ingredient-cost-string ?act-cost-string ?quantity-string ?year ?month)
@@ -77,3 +83,9 @@
         (filtered-prescriptions
           (hfs-delimited "./input/prescriptions/adhd" :delimiter ","))))
 
+#_ ;; Read from the filtered list and work out the total per ccg per month 
+#_(?- (hfs-delimited "./output/total-cost-of-adhd-per-ccg" :delimiter "," :sinkmode :replace)
+      (total-cost-of-adhd-per-month-per-ccg
+        (filtered-prescriptions
+          (hfs-delimited "./input/prescriptions/adhd" :delimiter ","))
+        (ods/current-practices (hfs-delimited "./input/ods/gppractice/epraccur.csv" :delimiter ","))))
