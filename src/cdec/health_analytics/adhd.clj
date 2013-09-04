@@ -55,6 +55,18 @@
       (ops/sum ?net-ingredient-cost :> ?total-net-ingredient-cost)
       (epraccur :#> 20 {0 ?practice 12 ?status-code 14 ?ccg})))
 
+(defn spend-per-head [patients total]
+  (/ total patients))
+
+(defn adhd-spend-per-head-per-ccg-per-month [scrips epraccur counts]
+  (<- [?ccg ?ccg-spend-per-head ?year ?month]
+      (scrips :> ?sha ?pct ?practice ?bnf-code ?bnf-chemical ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?year ?month)
+      (ops/sum ?net-ingredient-cost :> ?ccg-net-ingredient-cost)
+      (ops/sum ?gp-patient-count :> ?ccg-patient-count)
+      (spend-per-head ?ccg-patient-count ?ccg-net-ingredient-cost :> ?ccg-spend-per-head)
+      (epraccur :#> 20 {0 ?practice 12 ?status-code 14 ?ccg})
+      (counts :> ?practice ?gp-patient-count)))
+
 (defn filtered-prescriptions [in]
   (<- [?sha ?pct ?practice ?bnf-code ?bnf-chemical ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?year ?month]
       (in :> ?sha ?pct ?practice ?bnf-code ?bnf-chemical ?bnf-name ?items-string ?net-ingredient-cost-string ?act-cost-string ?quantity-string ?year ?month)
@@ -63,6 +75,10 @@
       (conv/parse-double ?net-ingredient-cost-string :> ?net-ingredient-cost)
       (conv/parse-double ?act-cost-string :> ?act-cost)
       (conv/parse-double ?quantity-string :> ?quantity)))
+
+(defn practice-patient-counts [in]
+  (<- [?practice-code ?patient-count]
+    ((prevalence/diabetes-prevalence-gp in) :#> 5 { 0 ?practice-code 2 ?patient-count})))
 
 ;; Create a filtered sink containing only the prescriptions we care about
 #_(?- (hfs-delimited "./input/prescriptions/adhd" :delimiter "," :sinkmode :replace)
@@ -89,3 +105,20 @@
         (filtered-prescriptions
           (hfs-delimited "./input/prescriptions/adhd" :delimiter ","))
         (ods/current-practices (hfs-delimited "./input/ods/gppractice/epraccur.csv" :delimiter ","))))
+
+;; I can't find prevalence data, so any stats will have to be done based on per-head data
+;; but can probably make some estimates based off the assumptions found here:
+;; http://www.nice.org.uk/usingguidance/commissioningguides/adhd/adhdassumptionsusedinestimatingapopulationbenchmark.jsp
+;; SHA Code,Strategic Health Authority Name,PCT Code,PCT Name,Practice Code,Practice Name,Estimated number 17+,Register (ages 17+),Prevalence
+;; "/input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv"
+;; Seems to have patient numbers in them as, and we can ignore the diabetes count - if I understand the data anyway
+;; Of course, this only gives us 17+ aged people and we're looking at ADHD so...
+
+;; Reading from the filtered list, spend per head per CCG for ADHD
+#_(?- (hfs-delimited "./output/spend-per-head-on-adhd-per-ccg" :delimiter "," :sinkmode :replace)
+      (adhd-spend-per-head-per-ccg-per-month
+        (filtered-prescriptions
+          (hfs-delimited "./input/prescriptions/adhd" :delimiter ","))
+        (ods/current-practices (hfs-delimited "./input/ods/gppractice/epraccur.csv" :delimiter ","))
+        (practice-patient-counts (hfs-textline "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv" :delimiter ","))))
+
