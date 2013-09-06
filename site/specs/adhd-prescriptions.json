@@ -1,0 +1,39 @@
+{
+    "div": "adhd-prescriptions-map",
+    "view": [53.0, -1.5],
+    "zoom": 6,
+    "data":
+        {
+            "csv_url": "data/prescriptions_per_head_per_ccg.csv",
+            "json_url": "data/ccg-boundaries.json"
+        },
+    "merge" :
+        {
+            "csv_key": "ccg_code",
+            "json_object": "ccg_boundaries"
+
+        },
+    "legend":
+        {
+            "title" : "Prescriptions per head",
+            "categories": [],
+            "range": [0.030, 0.025, 0.020, 0.015, 0.010, 0.009, 0.008, 0.007],
+            "colors": ["#0C2C84", "#225EA8","#1D91C0", "#41B6C4", "#7FCDBB", "#C7E9B4","#EDF8B1", "#FFFFD9"]
+        },
+    "infoBox":
+        {
+            "header": "<h3>Prescriptions per head in the CCG</h3>",
+            "labels": ["CCG Code: ", "Registered Patients: ", "Total Prescriptions", "Prescriptions per Patient"],
+            "fields": [
+                "ccg_code",
+                "registered_patients",
+                "total_prescriptions",
+                "prescriptions_per_head"
+            ],
+            "formats": [null, "0,0", "0,0", "0,0"]
+        },
+    "marks":
+        {
+            "scaleField": "prescriptions_per_head"
+        }
+}
