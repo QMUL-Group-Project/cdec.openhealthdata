@@ -88,19 +88,6 @@
       (stats/variance ?ccg-spend-per-head :> ?spend-variance)
       (math/sqrt ?spend-variance :> ?spend-std-dev)))
 
-;;      (- ?ccg-spend-per-head ?spend-avg :> ?ccg-spend-per-head-deviation)
-;;      (math/expt ?ccg-spend-per-head-deviation 2 :> ?ccg-spend-deviation-squared)
-;;      (ops/sum ?ccg-spend-deviation-squared :> ?ccg-spend-deviation-total)
-;;      (math/sqrt ?ccg-spend-deviation-total :> ?spend-std-dev) 
-;;
-;;      (- ?ccg-scrips-per-head ?scrips-avg :> ?ccg-scrips-per-head-deviation)
-;;      (math/expt ?ccg-scrips-per-head-deviation 2 :> ?ccg-scrips-deviation-squared)
-;;      (ops/sum ?ccg-scrips-deviation-squared :> ?ccg-scrips-deviation-total)
-;;      (math/sqrt ?ccg-scrips-deviation-total :> ?scrips-std-dev)
-;;
-
-(defn adhd-standard-deviations)
-
 (defn adhd-summary-per-ccg [scrips epraccur counts]
   (<- [?ccg ?ccg-patient-count ?ccg-scrips-per-head ?ccg-spend-per-head]
       (scrips :> ?sha ?pct ?practice ?bnf-code ?bnf-chemical ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?year ?month)
