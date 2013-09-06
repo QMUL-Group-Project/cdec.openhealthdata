@@ -19,6 +19,11 @@
         height: 600px;
         margin: 0px 20px;
     }
+    #adhd-spend-map {
+        width: 600px;
+        height: 600px;
+        margin: 0px 20px;
+    }
   </style>
 </head>
 
@@ -78,10 +83,21 @@
                 <h2>Prescriptions for a single month across the UK</h2>
               </div>
               <div class="span4">
-                <p>This chart shows how many prescriptions are made per CCG (normalised by number of patients)</p>
+                <p>This chart shows how much CCG vary from the average in perscriptions per head</p>
               </div>
               <div class="span7">
                 <div id="adhd-prescriptions-map"></div>
+              </div>
+      </div>
+      <div class="span12">
+              <div class="span7 offset4">
+                <h2>Spend for a single month across the UK</h2>
+              </div>
+              <div class="span4">
+                <p>This chart shows how much CCG vary from the average in spend per head</p>
+              </div>
+              <div class="span7">
+                <div id="adhd-spend-map"></div>
               </div>
       </div>
     </div>
@@ -144,6 +160,7 @@
   <!-- put it all on a page -->
   <script type="text/javascript">
     spruceleaf("specs/adhd-prescriptions.json")
+    spruceleaf("specs/adhd-spend.json")
   </script>
 </body>
 </html>
