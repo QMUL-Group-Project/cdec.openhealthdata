@@ -242,8 +242,8 @@ var spruceleaf = function spruceleaf(spec) {
             var legend = L.control({position: 'bottomright'});
             legend.onAdd = function (map) {
 
-                this._div = L.DomUtil.create('div', 'info legend'),
-                    grades = gradesParam;
+                this._div = L.DomUtil.create('div', 'info legend');
+                var grades = gradesParam;
 
                 div = "<div class='my-legend'>" +
                     "<div class='legend-title'>" + title + "</div>" +
@@ -253,7 +253,7 @@ var spruceleaf = function spruceleaf(spec) {
                 // loop through our density intervals and generate a label with a colored square for each interval
                 for (var i = 0; i < defs.colors.length; i++) {
 
-                    div += '<li><span style="background:' + color(grades[i]) + '"></span>' + grades[i] +
+                    div += '<li><span style="background-color:' + color(grades[i]) + '"></span>' + grades[i] +
                         ' &ndash; ' +
                         grades[i + 1] + '</li>';
 
@@ -271,14 +271,14 @@ var spruceleaf = function spruceleaf(spec) {
 
             legend.onAdd = function (map) {
 
-                this._div = L.DomUtil.create('div', 'info legend'),
-                    grades = categories,
-                    labels = [];
+                this._div = L.DomUtil.create('div', 'info legend');
+                var  grades = categories,
+                     labels = [];
 
                 // loop through categories and generate a label with a colored square for each category
                 for (var i = 0; i < grades.length; i++) {
                     this._div.innerHTML +=
-                        '<i style="background:' + categoricalColor(i + 1) + '"></i> ' +
+                        '<i style="background-color:' + categoricalColor(i + 1) + '"></i> ' +
                             grades[i] + '<br>';
                 }
                 return this._div;

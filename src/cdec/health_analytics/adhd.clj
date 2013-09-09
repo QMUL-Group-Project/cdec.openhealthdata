@@ -60,23 +60,6 @@
 (defn spend-per-head [patients total]
   (/ total patients))
 
-(defn adhd-spend-per-head-per-ccg-per-month [scrips epraccur counts]
-  (<- [?ccg ?ccg-spend-per-head ?year ?month]
-      (scrips :> ?sha ?pct ?practice ?bnf-code ?bnf-chemical ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?year ?month)
-      (ops/sum ?net-ingredient-cost :> ?ccg-net-ingredient-cost)
-      (ops/sum ?gp-patient-count :> ?ccg-patient-count)
-      (spend-per-head ?ccg-patient-count ?ccg-net-ingredient-cost :> ?ccg-spend-per-head)
-      (epraccur :#> 20 {0 ?practice 12 ?status-code 14 ?ccg})
-      (counts :> ?practice ?gp-patient-count)))
-
-(defn adhd-scrips-per-head-per-ccg-per-month [scrips epraccur counts]
-  (<- [?ccg ?ccg-patient-count ?ccg-quantity ?ccg-average ?year ?month]
-      (scrips :> ?sha ?pct ?practice ?bnf-code ?bnf-chemical ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?year ?month)
-      (ops/sum ?quantity :> ?ccg-quantity)
-      (ops/sum ?gp-patient-count :> ?ccg-patient-count)
-      (/ ?ccg-quantity ?ccg-patient-count :> ?ccg-average)
-      (epraccur :#> 20 {0 ?practice 12 ?status-code 14 ?ccg})
-      (counts :> ?practice ?gp-patient-count)))
 
 (defn adhd-stats [summary] 
   (<- [?scrips-avg ?spend-avg ?scrips-std-dev ?spend-std-dev] 
@@ -124,18 +107,18 @@
       (< ?scrips-difference-abs (* 2 scrips-std-dev) :> false)))
 
 (defn adhd-spend-drift [summary average-spend spend-std-dev]
-  (<- [?ccg ?ccg-name ?ccg-patient-count ?ccg-scrips-per-head ?ccg-spend-per-head ?ccg-spend-drift]
+  (<- [?ccg ?ccg-name ?ccg-patient-count ?ccg-scrips-per-head ?ccg-spend-per-head ?ccg-spend-drift-percentage]
       (summary :> ?ccg ?ccg-name ?ccg-patient-count ?ccg-scrips-per-head ?ccg-spend-per-head)
       (- ?ccg-spend-per-head average-spend :> ?spend-difference)
-      (math/abs ?spend-difference :> ?spend-difference-abs)
-      (/ ?spend-difference-abs spend-std-dev :> ?ccg-spend-drift)))
+      (/ ?spend-difference spend-std-dev :> ?ccg-spend-drift)
+      (* 100 ?ccg-spend-drift :> ?ccg-spend-drift-percentage)))
 
 (defn adhd-scrips-drift [summary average-scrips scrips-std-dev]
-  (<- [?ccg ?ccg-name ?ccg-patient-count ?ccg-scrips-per-head ?ccg-spend-per-head ?ccg-scrips-drift]
+  (<- [?ccg ?ccg-name ?ccg-patient-count ?ccg-scrips-per-head ?ccg-spend-per-head ?ccg-scrips-drift-percentage]
       (summary :> ?ccg ?ccg-name ?ccg-patient-count ?ccg-scrips-per-head ?ccg-spend-per-head)
       (- ?ccg-scrips-per-head average-scrips :> ?scrips-difference)
-      (math/abs ?scrips-difference :> ?scrips-difference-abs)
-      (/ ?scrips-difference-abs scrips-std-dev :> ?ccg-scrips-drift)))
+      (/ ?scrips-difference scrips-std-dev :> ?ccg-scrips-drift)
+      (* 100 ?ccg-scrips-drift :> ?ccg-scrips-drift-percentage)))
 
 (defn filtered-prescriptions [in]
   (<- [?sha ?pct ?practice ?bnf-code ?bnf-chemical ?bnf-name ?items ?net-ingredient-cost ?act-cost ?quantity ?year ?month]
@@ -153,6 +136,20 @@
 (defn ccg-names [in]
   (<- [?ccg-code ?ccg-name]
       (in _ _ ?ccg-code ?ccg-name) (:distinct true)))
+
+(defn adhd-summary-from-data []
+  (adhd-summary-per-ccg
+    (filtered-prescriptions
+      (hfs-delimited "./input/prescriptions/adhd" :delimiter ","))
+    (ods/current-practices (hfs-delimited "./input/ods/gppractice/epraccur.csv" :delimiter ","))
+    (practice-patient-counts (hfs-textline "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv" :delimiter ","))
+    (ccg-names (hfs-delimited  "./input/ods/ccglist/ccg-lsoa.csv" :delimiter ","))))
+
+(defn test-patient-counts [scrips epraccur counts]
+  (<- [?ccg ?total-count]
+           (ops/sum ?gp-patient-count :> ?total-count)
+           (epraccur :#> 20 {0 ?practice 12 ?status-code 14 ?ccg})
+           (counts :> ?practice ?gp-patient-count)))
 
 ;; Create a filtered sink containing only the prescriptions we care about
 #_(?- (hfs-delimited "./input/prescriptions/adhd" :delimiter "," :sinkmode :replace)
@@ -180,6 +177,7 @@
           (hfs-delimited "./input/prescriptions/adhd" :delimiter ","))
         (ods/current-practices (hfs-delimited "./input/ods/gppractice/epraccur.csv" :delimiter ","))))
 
+
 #_ ;; I can't find prevalence data, so any stats will have to be done based on per-head data
 #_ ;; but can probably make some estimates based off the assumptions found here:
 #_ ;; http://www.nice.org.uk/usingguidance/commissioningguides/adhd/adhdassumptionsusedinestimatingapopulationbenchmark.jsp
@@ -196,11 +194,6 @@
         (ods/current-practices (hfs-delimited "./input/ods/gppractice/epraccur.csv" :delimiter ","))
         (practice-patient-counts (hfs-textline "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv" :delimiter ","))))
 
-(defn test-patient-counts [scrips epraccur counts]
-  (<- [?ccg ?total-count]
-           (ops/sum ?gp-patient-count :> ?total-count)
-           (epraccur :#> 20 {0 ?practice 12 ?status-code 14 ?ccg})
-           (counts :> ?practice ?gp-patient-count)))
 
 #_ (?- (stdout)
       (test-patient-counts 
@@ -217,13 +210,6 @@
         (ods/current-practices (hfs-delimited "./input/ods/gppractice/epraccur.csv" :delimiter ","))
         (practice-patient-counts (hfs-textline "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv" :delimiter ",")))) 
 
-(defn adhd-summary-from-data []
-  (adhd-summary-per-ccg
-    (filtered-prescriptions
-      (hfs-delimited "./input/prescriptions/adhd" :delimiter ","))
-    (ods/current-practices (hfs-delimited "./input/ods/gppractice/epraccur.csv" :delimiter ","))
-    (practice-patient-counts (hfs-textline "./input/QOF1011_Pracs_Prevalence_DiabetesMellitus.csv" :delimiter ","))
-    (ccg-names (hfs-delimited  "./input/ods/ccglist/ccg-lsoa.csv" :delimiter ","))))
 
 #_ (?- (stdout)
        (adhd-summary-per-ccg
@@ -236,11 +222,11 @@
 
 #_ (?- (stdout) (adhd-summary-from-data))
 #_ (?- (stdout) (adhd-stats (adhd-summary-from-data)))
-#_ 0.07739164550331913 0.07296365966422276 0.048713321368423615  0.05144734865609667
+#_ 0.001700475480246234 0.07296365966422276 0.001241849517555931  0.05144734865609667
 
-(def scrips-avg 0.07739164550331913)
+(def scrips-avg 0.001700475480246234)
 (def spend-avg 0.07296365966422276)
-(def scrips-stddev 0.048713321368423615)
+(def scrips-stddev 0.001241849517555931)
 (def spend-stddev 0.05144734865609667)
 
 #_ (?- (stdout) (adhd-spend-outliers (adhd-summary-from-data) spend-avg spend-stddev))

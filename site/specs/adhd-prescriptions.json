@@ -1,6 +1,6 @@
 {
     "div": "adhd-prescriptions-map",
-    "view": [53.0, -1.5],
+    "view": [53.0, -0.5],
     "zoom": 6,
     "data":
         {
@@ -17,21 +17,20 @@
         {
             "title" : "Prescriptions per head",
             "categories": [],
-            "range": [ 0, 0.2, 0.3, 0.5, 0.9, 1.3, 1.5, 2.5],
-            "colors": ["#0C2C84", "#225EA8","#1D91C0", "#41B6C4", "#7FCDBB", "#C7E9B4","#EDF8B1", "#FFFFD9"]
+            "range": [ 200, 150, 100, 50, 0, -50, -100, -150, -200],
+            "colors": ["#FF0000", "#BF4000","#808000", "#40BF00", "#00FF00", "#00BF40","#008080", "#0040BF", "#0000FF"]
         },
     "infoBox":
         {
             "header": "<h3>Variance of prescriptions</h3>",
-            "labels": ["CCG Code: ", "CCG Name: ", "Registered Patients: ", "Average scrips per head: ", "variance from mean: "],
+            "labels": ["CCG Code: ", "CCG Name: ", "Registered Patients: ", "Deviance from mean: "],
             "fields": [
                 "ccg_code",
                 "ccg_name",
                 "ccg_patient_count",
-                "ccg_scrips_per_head",
                 "ccg_scrips_drift"
             ],
-            "formats": [null, null, "0,0", "0,0.0", "0,0.0"]
+            "formats": [null, null, "0,0", "0,0.0"]
         },
     "marks":
         {
