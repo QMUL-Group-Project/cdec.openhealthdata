@@ -1,7 +1,7 @@
 (function(exports) {
 
   function ccg_scrips_drift(d) {
-    return parseInt(d.ccg_scrips_drift, 10)
+    return parseInt(d.gp_scrips_drift, 10)
   }
 
   function chartMeUp(div, csv) {
@@ -37,7 +37,7 @@
   }
 
   exports.prescriptionDistribution =  function(div) {
-    d3.csv("data/adhd-scrips-drift.csv", function(csv) {
+    d3.csv("data/adhd-gp-scrips-drift.csv", function(csv) {
       chartMeUp(div, csv);
     })
   }
