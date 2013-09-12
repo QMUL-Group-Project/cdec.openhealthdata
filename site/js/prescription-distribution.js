@@ -1,43 +1,47 @@
 (function(exports) {
 
-  function ccg_scrips_drift(d) {
-    return parseInt(d.gp_scrips_drift, 10)
+  function drift(d) {
+    return parseFloat(d.drift)
   }
 
   function chartMeUp(div, csv) {
+
     var svg = d3.select("#" + div).append('svg')
                 .attr("width", 600)
                 .attr("height", 480)
 
-    var minx = d3.min(csv, ccg_scrips_drift)
-      , maxx = d3.max(csv, ccg_scrips_drift)
+    var minx = d3.min(csv, drift)
+      , maxx = d3.max(csv, drift)
+      , bucketcount = 1000
 
-    var xscale = d3.scale.linear()
-                    .range([ 0, 600 ])
-                    .domain([minx, maxx])
+    var step = (maxx - minx) / bucketcount;
 
-    var layout = d3.layout.histogram()
-                   .bins(xscale.ticks(100))
-                   .value(ccg_scrips_drift)
-                   .frequency(true)
-                   (csv)
-          
-    var yscale = d3.scale.linear()
-                   .range([0, 450])
-                   .domain([ 0, d3.max(layout, function(d) { return d.y }) ])
+    var buckets = []
+    for(var i = 0 ; i <= bucketcount ; i++)
+      buckets[i] = { count: 0, key: (i * step) + minx, entries: [] }
 
-    var bars = svg.selectAll(".bar")
-                 .data(layout)
-                 .enter().append("rect")
-                  .attr("class", "bar")
-                  .attr("x", function(d) { return xscale(d.x)})
-                  .attr("y", function(d) { return 450 - yscale(d.y)})
-                  .attr("width", xscale(layout[0].dx + minx))
-                  .attr("height", function(d) { return yscale(d.y) })
+    for(i =0 ; i < csv.length; i++) {
+      var item = csv[i]
+        , index = parseInt((drift(item) - minx) / step, 10)
+      buckets[index].count++
+      buckets[index].entries.push(item.name)
+    }
+
+    for(var i = 0 ; i <= bucketcount ; i++)
+      if(buckets[i].entries.length > 5)
+        buckets[i].entries = []
+
+    var myChart = _chart = new dimple.chart(svg, buckets);
+    myChart.setBounds(60, 30, 510, 305)
+    var x = myChart.addCategoryAxis("x", ["key", "entries"]);
+    x.addOrderRule("key")
+    var y = myChart.addMeasureAxis("y", "count");
+    myChart.addSeries(null, dimple.plot.bar);
+    myChart.draw();
   }
 
-  exports.prescriptionDistribution =  function(div) {
-    d3.csv("data/adhd-gp-scrips-drift.csv", function(csv) {
+  exports.prescriptionDistribution =  function(div, file) {
+    d3.csv(file, function(csv) {
       chartMeUp(div, csv);
     })
   }

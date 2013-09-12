@@ -14,26 +14,12 @@
   <script src="http://assets.theodi.org/js/bootstrap-tab.js"> </script>
   <script src="http://d3js.org/d3.v3.js"></script>
   <style>
-    #adhd-prescriptions-map {
+    .chart {
         width: 600px;
         height: 600px;
         margin: 0px 20px;
     }
-    #adhd-spend-map {
-        width: 600px;
-        height: 600px;
-        margin: 0px 20px;
-    }
-    #adhd-spend-scrips-map {
-        width: 600px;
-        height: 600px;
-        margin: 0px 20px;
-    }
-    #adhd-distribution-chart{
-        width: 600px;
-        height: 600px;
-        margin: 0px 20px;
-    }
+    .chart .tick { display: none; }
   </style>
 </head>
 
@@ -81,62 +67,74 @@
         <h1>Home</h1>
       </div>
     </header>
-
     <div class="container main-default" id="main">
       <div class="row">
         <div class="jumbotron span12">
           <h2>ADHD</h2>
           <p class="lead">This site takes data from sources like the <a href="http://www.hscic.gov.uk/">Health and Social Care Information Centre (HSCIC)</a> and shows how it can be turned into visualisations and analysis to answer specific questions for your organisation. This is the <strong>ALPHA</strong> version of the site</p>
+          <p>This page is an exploration of ADHD prescriptions across the UK</p>
         </div>
       <div class="span12">
-              <div class="span7 offset4">
-                <h2>ADHD Prescription Distribution</h2>
-              </div>
-              <div class="span4">
-                <p>ADHD prescriptions are made in the various CCGs across the UK</p>
-                <p>This is a chart showing the distribution of prescriptions per patient-count in each CCG.</p>
-              </div>
-              <div class="span7">
-                <div id="adhd-distribution-chart"></div>
-              </div>
+        <div class="span7 offset4">
+          <h2>(Uncleaned) ADHD prescription variance across the UK</h2>
+        </div>
+        <div class="span4">
+          <p>This chart shows how many prescriptions are issued across the UK per registered patient in that area.</p>
+          <p>This is the original raw data, aggregated per CCG then normalised by patient count</p>
+          <p>As can be seen, there are some clear outliers in the data (with 8x standard deviation and 4x standard deviation in two cases!)
+        </div>
+        <div class="span7">
+          <div id="adhd-prescriptions-map-unclean" class="chart"></div>
+        </div>
       </div>
       <div class="span12">
-              <div class="span7 offset4">
-                <h2>ADHD prescription variance across the UK</h2>
-              </div>
-              <div class="span4">
-                <p>This chart shows how many prescriptions are issued across the UK per registered patient in that area.</p>
-                <p>There is no prevalance data available so this <i>could</i> be taken as a representation of prevalance, or at least diagnosis.<p>
-                <p>The colours are based on the deviation from the mean, this is shown to be statistically relevant beyond 2SDs because of the even distribution in the chart above.</p>
-                <p>
-              </div>
-              <div class="span7">
-                <div id="adhd-prescriptions-map"></div>
-              </div>
+        <div class="span7 offset4">
+          <h2>ADHD Prescription Distribution</h2>
+        </div>
+        <div class="span4">
+          <p>To better understand the distribution of this data, we can map this variance into a histogram</p>
+          <p>It is clear from this initial histogram that the outliers are so far off the scale to be skewing the whole result set</p>
+          <p>This data can be removed and the process repeated</p>
+        </div>
+        <div class="span7">
+          <div id="adhd-distribution-chart-unclean" class="chart"></div>
+        </div>
       </div>
       <div class="span12">
-              <div class="span7 offset4">
-                <h2>ADHD cost variance across the UK</h2>
-              </div>
-              <div class="span4">
-                <p>this chart shows how much each ccg spends per registered patient on adhd prescriptions</p>
-                <p>as expected, it roughly mirrors the chart showing how many prescriptions are made per registered patient</p>
-              </div>
-              <div class="span7">
-                <div id="adhd-spend-map"></div>
-              </div>
+        <div class="span7 offset4">
+          <h2>ADHD prescription variance across the UK</h2>
+        </div>
+        <div class="span4">
+          <p>This chart shows how many prescriptions are issued across the UK per registered patient in that area.</p>
+          <p>This is the filtered data, aggregated per CCG then normalised by patient count, with the obvious outliers having been pre-removed</p>
+        </div>
+        <div class="span7">
+          <div id="adhd-prescriptions-map" class="chart"></div>
+        </div>
       </div>
       <div class="span12">
-              <div class="span7 offset4">
-                <h2>ADHD deviation from expected cost</h2>
-              </div>
-              <div class="span4">
-                <p>this chart shows how much each ccg spends per registered patient, taking into account how many prescriptions are made in the CCG</p>
-                <p>It roughly demonstrates that CCGs making more prescriptions are more cost effective, but not really because my maths is all wrong.</p>
-              </div>
-              <div class="span7">
-                <div id="adhd-spend-scrips-map"></div>
-              </div>
+        <div class="span7 offset4">
+          <h2>ADHD Prescription Distribution</h2>
+        </div>
+        <div class="span4">
+          <p>Mapping the distribution of the cleaned data to a histogram, we can see that the data is still skewed to the low side of the mean</p>
+          <p>This looks like a "log normal distribution", and is most likely the result of having combined several datasets with a multiplicative effect</p>
+        </div>
+        <div class="span7">
+          <div id="adhd-distribution-chart" class="chart"></div>
+        </div>
+      </div>
+      <div class="span12">
+        <div class="span7 offset4">
+          <h2>CCG Drilldown</h2>
+        </div>
+        <div class="span4">
+          <p>There are some interesting outliers in the map of England, we can dive down into the CCGs to investigate whether this is the result of 
+          overall more prescriptions per GP being handed out, or there being a few specialists in the CCG</p>
+        </div>
+        <div class="span7">
+          <div id="adhd-ccg-breakdown" class="chart"></div>
+        </div>
       </div>
     </div>
     </div>
@@ -197,13 +195,20 @@
 
   <!-- d3 charts -->
   <script src="js/prescription-distribution.js"></script>
+  <script src="js/adhd-ccg-breakdown.js"></script>
 
   <!-- put it all on a page -->
   <script type="text/javascript">
-    prescriptionDistribution("adhd-distribution-chart")
-    spruceleaf("specs/adhd-prescriptions.json")
-    spruceleaf("specs/adhd-spend.json")
-    spruceleaf("specs/adhd-spend-scrips.json")
+
+    spruceleaf("specs/adhd-prescriptions-map-unclean.json")
+    prescriptionDistribution("adhd-distribution-chart-unclean", "data/adhd-gp-scrips-drift-unclean.csv")
+
+    spruceleaf("specs/adhd-prescriptions-map.json")
+    prescriptionDistribution("adhd-distribution-chart", "data/adhd-gp-scrips-drift.csv")
+
+    ccgBreakdown('adhd-ccg-breakdown')
+    changeCcgInBreakdown('00C')
+
   </script>
 </body>
 </html>
