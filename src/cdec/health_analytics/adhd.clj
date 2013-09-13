@@ -149,9 +149,10 @@
       (ops/sum ?net-ingredient-cost :> ?gp-total-spend)))
 
 (defn adhd-summary-per-gp [scrips practises]
-  (<- [?gp ?gp-name ?gp-patient-count ?gp-scrips-per-head ?gp-spend-per-head]
+  (<- [?id ?gp-name ?gp-patient-count ?gp-scrips-per-head ?gp-spend-per-head]
       (practises :> ?gp ?ccg ?gp-name ?gp-patient-count)
       ((per-gp-totals scrips) :> ?gp ?gp-total-scrips ?gp-total-spend)
+      (str ?ccg "-" ?gp :> ?id)
       (/ ?gp-total-scrips ?gp-patient-count :> ?gp-scrips-per-head)
       (/ ?gp-total-spend ?gp-patient-count :> ?gp-spend-per-head)))
 
@@ -262,6 +263,7 @@
 #_ (?- (stdout) (adhd-stats (adhd-ccg-summary-from-data "./input/practice-summaries")))
 #_ (?- (stdout) (adhd-stats (adhd-gp-summary-from-data "./input/practice-summaries")))
 
+
 ;; These are the averages when running the summaries with no args
 ;; We can use these to eliminate outliers
 
@@ -344,12 +346,10 @@
 #_ (?- (hfs-delimited "./output/adhd-ccg-scrips-drift" :delimiter "," :sinkmode :replace :skip-header? true) 
        (adhd-scrips-drift (adhd-ccg-summary-from-data "./input/practices-without-outliers") ccg-scrips-avg ccg-scrips-stddev))
 
-;; TODO: Export CCG info here too
 ;;  ?id ?name ?patient-count ?scrips-per-head ?spend-per-head ?drift]
 #_ (?- (hfs-delimited "./output/adhd-gp-spend-drift" :delimiter "," :sinkmode :replace :skip-header? true) 
        (adhd-spend-drift (adhd-gp-summary-from-data "./input/practices-without-outliers") gp-spend-avg gp-spend-stddev))
 
-;; TODO: Export CCG info here too
 ;;  ?id ?name ?patient-count ?scrips-per-head ?spend-per-head ?drift]
 #_ (?- (hfs-delimited "./output/adhd-gp-scrips-drift" :delimiter "," :sinkmode :replace :skip-header? true)
        (adhd-scrips-drift (adhd-gp-summary-from-data "./input/practices-without-outliers") gp-scrips-avg gp-scrips-stddev))
