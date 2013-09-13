@@ -14,7 +14,7 @@
         },
     "legend":
         {
-            "title" : "Prescriptions per head",
+            "title" : "Deviation from the mean",
             "categories": [],
             "range": [ 4, 3, 2, 1, 0.5, 0, -0.5, -1, -2, -3, -4],
             "colors": ["#A50026", "#D73027","#F46D43", "#FDAE61", "#FEE090", "#FFFFBF","#E0F3F8", "#ABD9E9", "#74ADD1", "#4575B4", "#313695"]
