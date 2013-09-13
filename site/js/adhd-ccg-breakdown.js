@@ -21,20 +21,18 @@
   function generateChartForCcg(svg, ccg, data) {
     data = data.filter(function(i) { return i.ccg_code === ccg })
 
-//    var svg = dimple.newSvg("#chartContainer", 590, 400);
-
     if(_chart) {
       _chart.data = data
-      _chart.draw()
+      _chart.draw(2000)
     } else {
-      var myChart = _chart = new dimple.chart(svg, data);
-      myChart.setBounds(60, 30, 510, 305)
-      var x = myChart.addCategoryAxis("x", "name");
-      var y = myChart.addMeasureAxis("y", "drift");
-      y.overrideMin = -2;  
-      y.overrideMax = 10;   
-      myChart.addSeries(null, dimple.plot.bar);
-      myChart.draw();
+      var myChart = _chart = new dimple.chart(svg, data)
+      myChart.setBounds(50, 30, 350, 250)
+      var x = myChart.addCategoryAxis("x", "name")
+      var y = myChart.addMeasureAxis("y", "drift")
+      y.overrideMin = -2  
+      y.overrideMax = 10   
+      myChart.addSeries(null, dimple.plot.bar)
+      myChart.draw()
     }
   }
 
@@ -49,8 +47,8 @@
   exports.ccgBreakdown = function(div) {
     _svg = d3.select('#' + div)
                 .append('svg')
-                .attr('width', 600)
-                .attr('height', 480)
+                .attr('width', 400)
+                .attr('height', 280)
 
     d3.csv('data/adhd-gp-scrips-drift.csv', function(items) {
       d3.csv('data/gp_ccg_prevalence.csv', function(gpccgmap) {

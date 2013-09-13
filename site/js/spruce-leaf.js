@@ -1,4 +1,5 @@
-var spruceleaf = function spruceleaf(spec) {
+var spruceleaf = function spruceleaf(spec, opts) {
+  opts = opts || {}
 
     function parseSpec(spec) {
 
@@ -117,16 +118,22 @@ var spruceleaf = function spruceleaf(spec) {
                 layer.bringToFront();
             }
             map.info.update(layer.feature.properties);
+            if(opts.onHighlightFeature)
+              opts.onHighlightFeature(e)
         }
 
         function resetHighlight(e) {
             var layer = e.target;
             layer.setStyle(style(e.target.feature));
             map.info.update();
+            if(opts.onResetHighlight)
+              opts.onResetHighlight(e)
         }
 
         function zoomToFeature(e) {
             map.fitBounds(e.target.getBounds());
+            if(opts.onZoomToFeature)
+              opts.onZoomToFeature(e)
         }
 
         ///// Merge CSV with TOPOJSON /////////////////////////////////////////////////////////////////////////////////////

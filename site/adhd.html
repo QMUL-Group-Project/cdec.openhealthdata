@@ -14,12 +14,33 @@
   <script src="http://assets.theodi.org/js/bootstrap-tab.js"> </script>
   <script src="http://d3js.org/d3.v3.js"></script>
   <style>
-    .chart {
+    .map {
         width: 600px;
         height: 600px;
-        margin: 0px 20px;
+        margin: 0px 0px;
     }
-    .chart .tick { display: none; }
+    .chart {
+        width: 600px;
+        height: 400px;
+        margin: 0px 0px;
+    }
+    .chart .tick, .inline-chart .tick{ display: none; }
+    .inline-chart {
+        width: 400px;
+        height: 300px;
+        margin: 0px 0px;
+    }
+    label {
+      float: none;
+      clear: right;
+    }
+    input[type=checkbox] {
+      float: left;
+      margin-right: 20px;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 
@@ -72,71 +93,56 @@
         <div class="jumbotron span12">
           <h2>ADHD</h2>
           <p class="lead">This site takes data from sources like the <a href="http://www.hscic.gov.uk/">Health and Social Care Information Centre (HSCIC)</a> and shows how it can be turned into visualisations and analysis to answer specific questions for your organisation. This is the <strong>ALPHA</strong> version of the site</p>
-          <p>This page is an exploration of ADHD prescriptions across the UK</p>
         </div>
       <div class="span12">
-        <div class="span7 offset4">
-          <h2>(Uncleaned) ADHD prescription variance across the UK</h2>
+        <div class="span7 offset3">
+          <h2>Prescriptions per head per GP</h2>
         </div>
         <div class="span4">
-          <p>This chart shows how many prescriptions are issued across the UK per registered patient in that area.</p>
-          <p>This is the original raw data, aggregated per CCG then normalised by patient count</p>
-          <p>As can be seen, there are some clear outliers in the data (with 8x standard deviation and 4x standard deviation in two cases!)
+          <p>This chart shows the raw numbers for each GP, taken over a 12 month period.</p>
+          <p>Totalled up are the number of prescriptions handed out per patient in each practice</p>
+          <p>There is a clear outlier, which turns out to be a GP serving only a very small number of patients - for the rest of this study they will be removed so as not to skew the results.</p>
         </div>
         <div class="span7">
-          <div id="adhd-prescriptions-map-unclean" class="chart"></div>
+          <input id="remove-outliers" type="checkbox"><label for="remove-outliers">Remove outliers</label>          
+          <div id="adhd-initial-scatter" class="chart"></div>
         </div>
       </div>
       <div class="span12">
-        <div class="span7 offset4">
-          <h2>ADHD Prescription Distribution</h2>
-        </div>
-        <div class="span4">
-          <p>To better understand the distribution of this data, we can map this variance into a histogram</p>
-          <p>It is clear from this initial histogram that the outliers are so far off the scale to be skewing the whole result set</p>
-          <p>This data can be removed and the process repeated</p>
+        <div class="span7 offset3">
+          <h2>Understanding the distribution</h2>
         </div>
         <div class="span7">
-          <div id="adhd-distribution-chart-unclean" class="chart"></div>
-        </div>
-      </div>
-      <div class="span12">
-        <div class="span7 offset4">
-          <h2>ADHD prescription variance across the UK</h2>
-        </div>
-        <div class="span4">
-          <p>This chart shows how many prescriptions are issued across the UK per registered patient in that area.</p>
-          <p>This is the filtered data, aggregated per CCG then normalised by patient count, with the obvious outliers having been pre-removed</p>
-        </div>
-        <div class="span7">
-          <div id="adhd-prescriptions-map" class="chart"></div>
-        </div>
-      </div>
-      <div class="span12">
-        <div class="span7 offset4">
-          <h2>ADHD Prescription Distribution</h2>
-        </div>
-        <div class="span4">
-          <p>Mapping the distribution of the cleaned data to a histogram, we can see that the data is still skewed to the low side of the mean</p>
-          <p>This looks like a "log normal distribution", and is most likely the result of having combined several datasets with a multiplicative effect</p>
-        </div>
-        <div class="span7">
+          <input id="apply-log" type="checkbox"><label for="apply-log">Normalise the distribution</label>          
           <div id="adhd-distribution-chart" class="chart"></div>
         </div>
+        <div class="span4">
+          <p>Mapping the prescriptions per head into a histogram, we can see that the majority of GPs are below average in the number of prescriptions, and a small number of GPs skew the results by being consistently above average.</p>
+          <p>This is actually an example of a lognormal distribution, which will impact how we calculate the variance when comparing different CCGs.</p>
+        </div>
       </div>
       <div class="span12">
-        <div class="span7 offset4">
-          <h2>CCG Drilldown</h2>
+        <div class="span7 offset3">
+          <h2>Prescription variance across the UK</h2>
         </div>
-        <div class="span4">
-          <p>There are some interesting outliers in the map of England, we can dive down into the CCGs to investigate whether this is the result of 
-          overall more prescriptions per GP being handed out, or there being a few specialists in the CCG</p>
+        <div class="span5">
+          <p>We can map the variance of this data across England, grouping the GP data by the CCG they reside in, to see if there are any particular areas to investigate further.</p>
+          <p>We might perhaps expect perhaps that the areas of high concentration are because of an outlying GP (specialists) </p>
+          <p>Hover over a CCG in the map above to see the breakdown in that area.</p>
+          <div id="adhd-ccg-breakdown" class="inline-chart"></div>
         </div>
-        <div class="span7">
-          <div id="adhd-ccg-breakdown" class="chart"></div>
+        <div class="span6">
+          <div id="adhd-prescriptions-map" class="map"></div>
         </div>
       </div>
-    </div>
+      <div class="span7 offset5">
+        <h2>Summary</h2>
+      </div>
+      <div class="span9 offset1">
+          <p>The areas of high concentration contain GPs that consistently prescribe ADHD drugs at a rate much higher than that of the national average, and the areas of low concentration contain GPs that consistently prescribe ADHD drugs at a rate much lower than that of the national average</p>
+          <p>What is interesting, is that in bordering CCGs (such as the Wirral and Liverpool), is the stark divide in prescribing practises between the two.</p>
+          <p>More work would need to be done to determine the reason for this, as it is unlikely to be anything as simple as "There is a higher prevalence of ADHD in those areas. It would be interesting to look at factors such as the birth-rates, economic factors and similar too.</p>
+      </div>
     </div>
   </div>
 
@@ -177,7 +183,7 @@
   <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
   <script src="http://dimplejs.org/dist/dimple.v1.min.js"></script>
   <script src="http://underscorejs.org/underscore-min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/1.4.5/numeral.min.js"></script>
+  <script src="/js/numeral.min.js"></script>
   
   <!-- leaflet -->
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.2/leaflet.css" />
@@ -196,18 +202,30 @@
   <!-- d3 charts -->
   <script src="js/prescription-distribution.js"></script>
   <script src="js/adhd-ccg-breakdown.js"></script>
+  <script src="js/adhd-initial-scatter.js"></script>
 
   <!-- put it all on a page -->
   <script type="text/javascript">
 
-    spruceleaf("specs/adhd-prescriptions-map-unclean.json")
-    prescriptionDistribution("adhd-distribution-chart-unclean", "data/adhd-gp-scrips-drift-unclean.csv")
+    initialScatter() 
 
-    spruceleaf("specs/adhd-prescriptions-map.json")
-    prescriptionDistribution("adhd-distribution-chart", "data/adhd-gp-scrips-drift.csv")
+    spruceleaf("specs/adhd-prescriptions-map.json", {
+      onZoomToFeature: function(e) {
+        changeCcgInBreakdown(e.target.feature.properties.ccg_code)
+      }
+    })
+    prescriptionDistribution()
 
     ccgBreakdown('adhd-ccg-breakdown')
     changeCcgInBreakdown('00C')
+
+    $("#apply-log").on('change', function() {
+      prescriptionDistribution($(this).is(":checked"))
+    })
+
+    $("#remove-outliers").on('change', function() {
+      initialScatter($(this).is(":checked"))
+    })
 
   </script>
 </body>
